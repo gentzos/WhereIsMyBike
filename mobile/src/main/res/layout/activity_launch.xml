@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/colorPrimary"
+    tools:context=".LaunchActivity">
+
+    <ScrollView
+        android:id="@+id/launch_form"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true">
+
+        <LinearLayout
+            android:id="@+id/launch_form2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center">
+
+            <ImageView
+                android:id="@+id/logo"
+                android:layout_width="wrap_content"
+                android:layout_height="200dp"
+                android:src="@drawable/logo" />
+
+            <LinearLayout
+                android:id="@+id/users"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center" >
+
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="8dp"
+                    android:background="@drawable/button_primary_dark">
+                    <Button
+                        android:id="@+id/bike_owner_btn"
+                        style="?android:textAppearanceSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:text="@string/title_activity_bike_user"
+                        android:textStyle="bold"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:textColor="@android:color/white" />
+                </FrameLayout>
+
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:background="@drawable/button_primary_dark">
+                    <Button
+                        android:id="@+id/police_btn"
+                        style="?android:textAppearanceSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:text="@string/title_activity_police"
+                        android:textStyle="bold"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:textColor="@android:color/white" />
+                </FrameLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>
+

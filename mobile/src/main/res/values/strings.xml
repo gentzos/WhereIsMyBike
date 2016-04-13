@@ -1,0 +1,45 @@
+<resources>
+    <string name="app_name">Where Is My Bike?</string>
+    <string name="title_activity_bike_user">Bike User</string>
+    <string name="title_activity_police">Police</string>
+    <string name="title_activity_bike_user_main">Dashboard</string>
+    <string name="title_activity_police_main">Police 1</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <!-- Strings related to login and register-->
+    <string name="prompt_fname">First Name</string>
+    <string name="prompt_lname">Last Name</string>
+    <string name="prompt_address">Address (Optional)</string>
+    <string name="prompt_pnumber">Phone Number (Optional)</string>
+    <string name="prompt_email_cfm">Confirm Email</string>
+    <string name="prompt_pwd_cfm">Confirm Password</string>
+    <string name="prompt_policeman_id">Policeman Id Number</string>
+
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="prompt_sign_in_with">Sign in with:</string>
+    <string name="prompt_or">or</string>
+    <string name="prompt_police_id">Police Id Number</string>
+    <string name="action_sign_in">Sign in</string>
+    <string name="action_register">Register</string>
+    <string name="action_forgot_pwd">Forgot Password</string>
+    <string name="action_facebook">Facebook</string>
+    <string name="action_google">Google +</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_invalid_id_number">This id number is too short</string>
+    <string name="error_incorrect_email">This email is incorrect</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_incorrect_pId">This id number is incorrect</string>
+    <string name="error_email_not_match">The email fields do not much</string>
+    <string name="error_password_not_match">The password fields do not match</string>
+    <string name="error_field_required">This field is required</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_dashboard_fragment">Dashboard Fragment</string>
+    <string name="hello_bikes_fragment">Bikes Fragment</string>
+    <string name="hello_account_fragment">Account Fragment</string>
+    <string name="hello_settings_fragment">Settings Fragment</string>
+</resources>
