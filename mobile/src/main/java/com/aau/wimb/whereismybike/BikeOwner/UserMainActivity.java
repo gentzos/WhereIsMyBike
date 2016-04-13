@@ -36,7 +36,7 @@ public class UserMainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Remember user.
+        // Remember user. haha
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         editor = preferences.edit();
         editor.putString("user","true");
