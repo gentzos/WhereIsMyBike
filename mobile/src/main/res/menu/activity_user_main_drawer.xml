@@ -3,25 +3,21 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_dashboard"
-            android:icon="@drawable/ic_menu_dashboard"
-            android:title="Dashboard"
-            android:checked="true"/>
-        <item
             android:id="@+id/nav_bikes"
             android:icon="@drawable/ic_menu_bikes"
-            android:title="Manage Bicycles" />
+            android:title="@string/title_activity_bike_user_main"
+            android:checked="true"/>
         <item
             android:id="@+id/nav_account"
             android:icon="@drawable/ic_menu_account"
-            android:title="Manage Account" />
+            android:title="@string/title_fragment_bike_user_account" />
         <item
             android:id="@+id/nav_settings"
             android:icon="@drawable/ic_menu_settings"
-            android:title="Settings" />
+            android:title="@string/title_fragment_bike_user_settings" />
         <item
             android:id="@+id/nav_logout"
             android:icon="@drawable/ic_menu_logout"
-            android:title="Log out" />
+            android:title="@string/title_fragment_bike_user_logout" />
     </group>
 </menu>

@@ -2,7 +2,7 @@
     <string name="app_name">Where Is My Bike?</string>
     <string name="title_activity_bike_user">Bike User</string>
     <string name="title_activity_police">Police</string>
-    <string name="title_activity_bike_user_main">Dashboard</string>
+    <string name="title_activity_bike_user_main">My Bicycles</string>
     <string name="title_activity_police_main">Police 1</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -37,8 +37,11 @@
     <string name="error_password_not_match">The password fields do not match</string>
     <string name="error_field_required">This field is required</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_dashboard_fragment">Dashboard Fragment</string>
+    <!-- Fragments -->
+    <string name="title_fragment_bike_user_account">Manage Account</string>
+    <string name="title_fragment_bike_user_settings">Settings</string>
+    <string name="title_fragment_bike_user_logout">Log out</string>
+
     <string name="hello_bikes_fragment">Bikes Fragment</string>
     <string name="hello_account_fragment">Account Fragment</string>
     <string name="hello_settings_fragment">Settings Fragment</string>
