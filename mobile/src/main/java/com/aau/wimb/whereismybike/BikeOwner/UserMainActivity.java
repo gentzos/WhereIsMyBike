@@ -56,7 +56,7 @@ public class UserMainActivity extends AppCompatActivity
         }
 
         // Set the home as default
-        Fragment fragment = new UserDashboardFragment();
+        Fragment fragment = new UserBikesFragment();
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.content, fragment)
@@ -106,18 +106,15 @@ public class UserMainActivity extends AppCompatActivity
             UserMainActivity.this.startActivity(myIntent);
             finish();
         } else {
-            if (id == R.id.nav_bikes) {
-                fragment = new UserBikesFragment();
-                setTitle("Manage Bicycles");
-            } else if (id == R.id.nav_account) {
+            if (id == R.id.nav_account) {
                 fragment = new UserAccountFragment();
                 setTitle("Manage Account");
             } else if (id == R.id.nav_settings) {
                 fragment = new UserSettingsFragment();
                 setTitle("Settings");
             } else {
-                fragment = new UserDashboardFragment();
-                setTitle("Dashboard");
+                fragment = new UserBikesFragment();
+                setTitle("Manage Bicycles");
             }
 
             FragmentManager fm = getSupportFragmentManager();
