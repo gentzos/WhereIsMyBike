@@ -108,13 +108,13 @@ public class UserMainActivity extends AppCompatActivity
         } else {
             if (id == R.id.nav_account) {
                 fragment = new UserAccountFragment();
-                setTitle("Manage Account");
+                setTitle(R.string.title_fragment_bike_user_account);
             } else if (id == R.id.nav_settings) {
                 fragment = new UserSettingsFragment();
-                setTitle("Settings");
+                setTitle(R.string.title_fragment_bike_user_settings);
             } else {
                 fragment = new UserBikesFragment();
-                setTitle("Manage Bicycles");
+                setTitle(R.string.title_activity_bike_user_main);
             }
 
             FragmentManager fm = getSupportFragmentManager();
