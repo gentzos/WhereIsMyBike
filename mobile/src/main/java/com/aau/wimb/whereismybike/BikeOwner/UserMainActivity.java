@@ -92,7 +92,7 @@ public class UserMainActivity extends AppCompatActivity
 
         mView =  navigationView.getHeaderView(0);
         mName = (TextView)mView.findViewById(R.id.nameView);
-        mEmail = (TextView)mView.findViewById(R.id.emailView);
+//        mEmail = (TextView)mView.findViewById(R.id.emailView);
 //        mProfileImage = (ImageView)mView.findViewById(R.id.profileImageView);
 
         // Set the home as default
