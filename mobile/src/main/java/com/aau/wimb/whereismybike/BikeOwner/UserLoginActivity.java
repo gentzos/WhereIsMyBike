@@ -4,6 +4,10 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 
 import android.os.AsyncTask;
@@ -11,6 +15,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -20,6 +25,28 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.aau.wimb.whereismybike.R;
+
+import com.facebook.AccessToken;
+import com.facebook.AccessTokenTracker;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
+import com.facebook.Profile;
+import com.facebook.ProfileTracker;
+import com.facebook.appevents.AppEventsLogger;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A login screen that offers login via email/password.
@@ -38,11 +65,44 @@ public class UserLoginActivity extends AppCompatActivity {
      */
     private UserLoginTask mAuthTask = null;
 
+    public static final String PARCEL_KEY = "parcel_key";
+
     // UI references.
     private EditText mEmailView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+    private Button mSignInButton;
+    private Button mRegisterButton;
+    private Button mForgotPasswordButton;
+    private LoginButton mFacebookButton;
+
+    private TextView fbInfo;
+
+    // To check if user had log in.
+    private String userLogin = "false";
+    private SharedPreferences preferences;
+    private SharedPreferences.Editor editor;
+
+    private Bundle mBundle;
+
+    // Facebook
+    private CallbackManager mCallbackManager = null;
+    private AccessTokenTracker mAccessTokenTracker = null;
+    private ProfileTracker mProfileTracker = null;
+    private AccessToken mAccessToken = null;
+    private Profile mProfile = null;
+
+    private AccessToken accessToken;
+    private Profile profile;
+
+    private UserAccount facebookUserAccount;
+    private String profileId = "none";
+    private String profileLink = "none";
+    private String profileFirstName = "none";
+    private String profileLastName = "none";
+    private String profileEmail = "none";
+    private String profilePicUrl = "none";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,11 +110,25 @@ public class UserLoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_login);
         setupActionBar();
 
+        // Facebook Initialize.
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        mCallbackManager = CallbackManager.Factory.create();
+
+        facebookUserAccount = new UserAccount();
+
         // Set up the login form.
         mEmailView = (EditText) findViewById(R.id.email);
         mPasswordView = (EditText) findViewById(R.id.password);
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        mSignInButton = (Button) findViewById(R.id.sign_in_button);
+        mRegisterButton = (Button) findViewById(R.id.register_button);
+        mForgotPasswordButton = (Button) findViewById(R.id.forgot_pwd_button);
+
+        // Facebook login.
+        fbInfo = (TextView)findViewById(R.id.info);
+        mFacebookButton = (LoginButton) findViewById(R.id.facebook_login);
 
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -67,17 +141,12 @@ public class UserLoginActivity extends AppCompatActivity {
             }
         });
 
-        Button mSignInButton = (Button) findViewById(R.id.sign_in_button);
-        Button mRegisterButton = (Button) findViewById(R.id.register_button);
-        Button mForgotPasswordButton = (Button) findViewById(R.id.forgot_pwd_button);
-        Button mFacebookButton = (Button) findViewById(R.id.facebook_button);
-        Button mGooglePlsButton = (Button) findViewById(R.id.google_plus_button);
-
         mRegisterButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent myIntent = new Intent(UserLoginActivity.this,UserRegisterActivity.class);
-                startActivityForResult(myIntent,3);
+//                startActivityForResult(myIntent,3);
+                UserLoginActivity.this.startActivity(myIntent);
             }
         });
 
@@ -87,13 +156,113 @@ public class UserLoginActivity extends AppCompatActivity {
                 attemptLogin();
             }
         });
+
+        mAccessTokenTracker = new AccessTokenTracker() {
+            @Override
+            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
+                Log.e("WiMB", "Access Token " + currentAccessToken);
+            }
+        };
+
+        mProfileTracker = new ProfileTracker() {
+            @Override
+            protected void onCurrentProfileChanged(Profile oldProfile, Profile currentProfile) {
+                Log.e("WiMB", "Profile " + currentProfile);
+            }
+        };
+
+        mAccessTokenTracker.startTracking();
+        mProfileTracker.startTracking();
+
+        if (AccessToken.getCurrentAccessToken() != null) {
+            mAccessTokenTracker = new AccessTokenTracker() {
+                @Override
+                protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
+                    mAccessTokenTracker.stopTracking();
+                    if(currentAccessToken == null) {
+                        //(the user has revoked your permissions -
+                        //by going to his settings and deleted your app)
+                        //do the simple login to FaceBook
+                        fbInfo.setText("You have been signed out, please login again.");
+                    }
+                    else {
+                        //you've got the new access token now.
+                        //AccessToken.getToken() could be same for both
+                        //parameters but you should only use "currentAccessToken"
+
+                        if(Profile.getCurrentProfile() != null) {
+                            mProfile = Profile.getCurrentProfile();
+
+                            mBundle = new Bundle();
+                            mBundle.putParcelable(PARCEL_KEY, Profile.getCurrentProfile());
+
+                            Intent myIntent = new Intent(UserLoginActivity.this,UserMainActivity.class);
+                            myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            myIntent.putExtras(mBundle);
+                            UserLoginActivity.this.startActivity(myIntent);
+                            finish();
+                        }
+                    }
+                }
+            };
+            AccessToken.refreshCurrentAccessTokenAsync();
+        }
+
+        mFacebookButton.setReadPermissions("email");
+        mFacebookButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+
+                mAccessToken = loginResult.getAccessToken();
+                mProfile = Profile.getCurrentProfile();
+
+                // User signed in.
+                preferences = PreferenceManager.getDefaultSharedPreferences(UserLoginActivity.this);
+                editor = preferences.edit();
+                editor.putString("userLogin","true");
+                editor.apply();
+
+                mBundle = new Bundle();
+                mBundle.putParcelable(PARCEL_KEY, mProfile);
+
+                Intent myIntent = new Intent(UserLoginActivity.this,UserMainActivity.class);
+                myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                myIntent.putExtras(mBundle);
+                UserLoginActivity.this.startActivity(myIntent);
+                finish();
+            }
+
+            @Override
+            public void onCancel() {
+                Log.v("facebook - onCancel", "cancelled");
+            }
+
+            @Override
+            public void onError(FacebookException e) {
+                Log.v("facebook - onError", e.getMessage());
+            }
+        });
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == 3) {
-            setResult(2);
-            finish();
-        }
+        super.onActivityResult(requestCode, resultCode, data);
+        mCallbackManager.onActivityResult(requestCode, resultCode, data);
+//        if (resultCode == 3) {
+//            setResult(2);
+//            finish();
+//        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mAccessTokenTracker.stopTracking();
+        mProfileTracker.stopTracking();
     }
 
     /**
@@ -253,7 +422,7 @@ public class UserLoginActivity extends AppCompatActivity {
 
             if (success) {
                 Intent myIntent = new Intent(UserLoginActivity.this,UserMainActivity.class);
-                setResult(2);
+//                setResult(2);
                 myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 UserLoginActivity.this.startActivity(myIntent);
                 finish();

@@ -19,14 +19,10 @@
 
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
-    <string name="prompt_sign_in_with">Sign in with:</string>
-    <string name="prompt_or">or</string>
     <string name="prompt_police_id">Police Id Number</string>
     <string name="action_sign_in">Sign in</string>
     <string name="action_register">Register</string>
     <string name="action_forgot_pwd">Forgot Password</string>
-    <string name="action_facebook">Facebook</string>
-    <string name="action_google">Google +</string>
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_invalid_id_number">This id number is too short</string>
@@ -45,4 +41,7 @@
     <string name="hello_bikes_fragment">Bikes Fragment</string>
     <string name="hello_account_fragment">Account Fragment</string>
     <string name="hello_settings_fragment">Settings Fragment</string>
+
+    <!-- Facebook -->
+    <string name="facebook_app_id">108219459582853</string>
 </resources>

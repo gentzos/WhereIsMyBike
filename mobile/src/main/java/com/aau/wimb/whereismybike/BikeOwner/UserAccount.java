@@ -1,5 +1,4 @@
 package com.aau.wimb.whereismybike.BikeOwner;
-
 import com.aau.wimb.whereismybike.Account;
 
 /**
@@ -15,6 +14,26 @@ public class UserAccount implements Account {
     private String address;
     private String phoneNumber;
     private String createDate;
+
+    // Facebook
+    String profileId;
+    String profileLink;
+    String profileFirstName;
+    String profileLastName;
+    String profileEmail;
+    String profilePicUrl;
+
+    public UserAccount() {
+    }
+
+    public UserAccount(String profileId, String profileLink, String profileFirstName, String profileLastName, String profileEmail, String profilePicUrl) {
+        this.profileId = profileId;
+        this.profileLink = profileLink;
+        this.profileFirstName = profileFirstName;
+        this.profileLastName = profileLastName;
+        this.profileEmail = profileEmail;
+        this.profilePicUrl = profilePicUrl;
+    }
 
     public UserAccount(String uniqueId, String email, String pwd, String firstName, String lastName, String address, String phoneNumber, String createDate) {
         this.uniqueId = uniqueId;
@@ -91,6 +110,54 @@ public class UserAccount implements Account {
         this.createDate = createDate;
     }
 
+    public String getProfileId() {
+        return profileId;
+    }
+
+    public void setProfileId(String profileId) {
+        this.profileId = profileId;
+    }
+
+    public String getProfileLink() {
+        return profileLink;
+    }
+
+    public void setProfileLink(String profileLink) {
+        this.profileLink = profileLink;
+    }
+
+    public String getProfileFirstName() {
+        return profileFirstName;
+    }
+
+    public void setProfileFirstName(String profileFirstName) {
+        this.profileFirstName = profileFirstName;
+    }
+
+    public String getProfileLastName() {
+        return profileLastName;
+    }
+
+    public void setProfileLastName(String profileLastName) {
+        this.profileLastName = profileLastName;
+    }
+
+    public String getProfileEmail() {
+        return profileEmail;
+    }
+
+    public void setProfileEmail(String profileEmail) {
+        this.profileEmail = profileEmail;
+    }
+
+    public String getProfilePicUrl() {
+        return profilePicUrl;
+    }
+
+    public void setProfilePicUrl(String profilePicUrl) {
+        this.profilePicUrl = profilePicUrl;
+    }
+
     @Override
     public void register() {
 
@@ -126,5 +193,4 @@ public class UserAccount implements Account {
     public void activateAlarmOnOff(){
 
     }
-
 }
