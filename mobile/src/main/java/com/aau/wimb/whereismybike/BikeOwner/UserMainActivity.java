@@ -106,18 +106,9 @@ public class UserMainActivity extends AppCompatActivity
             mProfile = (Profile) mBundle.getParcelable(UserLoginActivity.PARCEL_KEY);
             mName.setText(mProfile.getFirstName() + " " + mProfile.getLastName());
 
-//            ProfilePictureView profilePictureView;
-//            profilePictureView = (ProfilePictureView)mView.findViewById(R.id.image3);
-//            profilePictureView.setProfileId(mProfile.getId());
-
-//            mProfileImage.setImageURI(mProfile.getProfilePictureUri(70, 70));
-
-//            Bitmap myImg = BitmapFactory.decodeFile(mProfile.getProfilePictureUri(70, 70).getPath());
-//            mProfileImage.setImageBitmap(myImg);
-
-//            Picasso.with(getActivity())
-//                    .load(mProfile.getProfilePictureUri(70, 70).toString())
-//                    .into(mProfileImage);
+            ProfilePictureView profilePictureView;
+            profilePictureView = (ProfilePictureView)mView.findViewById(R.id.fbProfileImage);
+            profilePictureView.setProfileId(mProfile.getId());
         }
     }
 
@@ -163,23 +154,6 @@ public class UserMainActivity extends AppCompatActivity
             editor = preferences.edit();
             editor.putString("userLogin", "false");
             editor.apply();
-
-            // Revoke Facebook permissions before logout.
-            GraphRequest delPermRequest = new GraphRequest(AccessToken.getCurrentAccessToken(), "/{user-id}/permissions/", null, HttpMethod.DELETE, new GraphRequest.Callback() {
-                @Override
-                public void onCompleted(GraphResponse graphResponse) {
-                    if(graphResponse!=null){
-                        FacebookRequestError error = graphResponse.getError();
-                        if(error!=null){
-                            Log.e("LOGOUTTTTT ERRORRRRRRR", error.toString());
-                        }else {
-                            finish();
-                        }
-                    }
-                }
-            });
-            Log.e("LOGOUTTTTT","Executing revoke permissions with graph path" + delPermRequest.getGraphPath());
-            delPermRequest.executeAsync();
 
             // Logout the user from Facebook.
             LoginManager.getInstance().logOut();
