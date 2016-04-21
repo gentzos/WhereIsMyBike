@@ -124,71 +124,20 @@
                 </FrameLayout>
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/sign_in"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
-                android:textSize="25sp"
-                android:textStyle="bold|italic"
-                android:text="@string/prompt_sign_in_with"
-                android:gravity="center"/>
-
-            <LinearLayout
-                android:id="@+id/login_form4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:layout_marginLeft="3dp"
-                android:layout_marginRight="3dp"
-                android:orientation="horizontal"
-                android:gravity="center">
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/button_facebook"
-                    android:layout_marginRight="5dp"
-                    android:layout_weight="1">
-                    <Button
-                        android:id="@+id/facebook_button"
-                        style="?android:textAppearanceSmall"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:text="@string/action_facebook"
-                        android:textStyle="bold"
-                        android:background="?android:attr/selectableItemBackground"
-                        android:textColor="@android:color/white"/>
-                </FrameLayout>
-
-                <TextView
-                    android:id="@+id/or"
+                <com.facebook.login.widget.LoginButton
+                    android:id="@+id/facebook_login"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
-                    android:textSize="20sp"
-                    android:textStyle="italic"
-                    android:text="@string/prompt_or" />
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="25dp"/>
 
-                <FrameLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/button_google_plus"
-                    android:layout_marginLeft="5dp"
-                    android:layout_weight="1">
-                    <Button
-                        android:id="@+id/google_plus_button"
-                        style="?android:textAppearanceSmall"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:text="@string/action_google"
-                        android:textStyle="bold"
-                        android:background="?android:attr/selectableItemBackground"
-                        android:textColor="@android:color/white"/>
-                </FrameLayout>
-
-            </LinearLayout>
+                    android:id="@+id/info"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"
+                    android:textSize="18sp" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>
