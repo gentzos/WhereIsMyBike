@@ -26,6 +26,7 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.aau.wimb.whereismybike.Bike;
 import com.aau.wimb.whereismybike.LaunchActivity;
 import com.aau.wimb.whereismybike.OnFragmentInteractionListener;
 import com.aau.wimb.whereismybike.R;
@@ -52,10 +53,15 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 
 
 public class UserMainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener {
+
+    private Fragment fragment;
+    private FragmentManager fragmentManager;
+    private int id;
 
     private TextView mName;
     private TextView mEmail;
@@ -67,6 +73,8 @@ public class UserMainActivity extends AppCompatActivity
 //    private CallbackManager callbackManager;
 
     private Profile mProfile = null;
+    private UserAccount user = new UserAccount();
+    private ArrayList bikes = new ArrayList<Bike>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,20 +103,38 @@ public class UserMainActivity extends AppCompatActivity
 //        mEmail = (TextView)mView.findViewById(R.id.emailView);
 //        mProfileImage = (ImageView)mView.findViewById(R.id.profileImageView);
 
+        Bike obj = new Bike("Black Panther ", "OD2F894NCUJEHDJM", "Locked", "None", "55.650299", "12.540938");
+        bikes.add(0, obj);
+        Bike obj1 = new Bike("Pink Jaguar ", "ODUJEHDJM", "Unlocked", "someone", "65.650299", "65.540938");
+        bikes.add(1, obj1);
+        Bike obj2 = new Bike("Pink  ", "DJM", "Locked", "someone", "75.650299", "75.540938");
+        bikes.add(2, obj2);
+        Bike obj3 = new Bike(" Jaguar ", "4NCUJEHDJM", "Unlocked", "None", "85.650299", "85.540938");
+        bikes.add(3, obj3);
+
         // Set the home as default
-        Fragment fragment = new UserBikesFragment();
-        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragment = new UserBikesFragment().newInstance(user, bikes);
+        fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.content, fragment)
                 .commit();
 
         if (mBundle != null) {
             mProfile = (Profile) mBundle.getParcelable(UserLoginActivity.PARCEL_KEY);
-            mName.setText(mProfile.getFirstName() + " " + mProfile.getLastName());
+
+            user.setUniqueId(mProfile.getId());
+            user.setProfileLink(mProfile.getLinkUri().toString());
+            user.setProfilePic(mProfile.getProfilePictureUri(50, 50).toString());
+            user.setFirstName(mProfile.getFirstName());
+            user.setLastName(mProfile.getLastName());
+
+            mName.setText(user.getFirstName() + " " + user.getLastName());
 
             ProfilePictureView profilePictureView;
             profilePictureView = (ProfilePictureView)mView.findViewById(R.id.fbProfileImage);
             profilePictureView.setProfileId(mProfile.getId());
+
+
         }
     }
 
@@ -140,12 +166,28 @@ public class UserMainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+//    @Override
+//    public void onSaveInstanceState(Bundle savedInstanceState) {
+//        // Always call the superclass so it can save the view hierarchy state
+//        super.onSaveInstanceState(savedInstanceState);
+//
+//        // Save the user's current game state
+//        savedInstanceState.putInt("FRAGMENT", id);
+//    }
+//
+//    public void onRestoreInstanceState(Bundle savedInstanceState) {
+//        // Always call the superclass so it can restore the view hierarchy
+//        super.onRestoreInstanceState(savedInstanceState);
+//
+//        // Restore state members from saved instance
+//        id = savedInstanceState.getInt("FRAGMENT");
+//    }
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        int id = item.getItemId();
-        Fragment fragment;
+        id = item.getItemId();
 
         if (id == R.id.nav_logout) {
 
@@ -171,12 +213,12 @@ public class UserMainActivity extends AppCompatActivity
                 fragment = new UserSettingsFragment();
                 setTitle(R.string.title_fragment_bike_user_settings);
             } else {
-                fragment = new UserBikesFragment();
+                fragment = new UserBikesFragment().newInstance(user, bikes);
                 setTitle(R.string.title_activity_bike_user_main);
             }
 
-            FragmentManager fm = getSupportFragmentManager();
-            fm.beginTransaction()
+            fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction()
                     .replace(R.id.content, fragment)
                     .commit();
         }

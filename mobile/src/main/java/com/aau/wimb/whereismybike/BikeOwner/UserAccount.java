@@ -1,10 +1,13 @@
 package com.aau.wimb.whereismybike.BikeOwner;
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.aau.wimb.whereismybike.Account;
 
 /**
  * Created by konst on 012 12/4/2016.
  */
-public class UserAccount implements Account {
+public class UserAccount implements Account, Parcelable {
 
     private String uniqueId;
     private String email;
@@ -13,26 +16,12 @@ public class UserAccount implements Account {
     private String lastName;
     private String address;
     private String phoneNumber;
-    private String createDate;
 
     // Facebook
-    String profileId;
     String profileLink;
-    String profileFirstName;
-    String profileLastName;
-    String profileEmail;
-    String profilePicUrl;
+    String profilePic;
 
     public UserAccount() {
-    }
-
-    public UserAccount(String profileId, String profileLink, String profileFirstName, String profileLastName, String profileEmail, String profilePicUrl) {
-        this.profileId = profileId;
-        this.profileLink = profileLink;
-        this.profileFirstName = profileFirstName;
-        this.profileLastName = profileLastName;
-        this.profileEmail = profileEmail;
-        this.profilePicUrl = profilePicUrl;
     }
 
     public UserAccount(String uniqueId, String email, String pwd, String firstName, String lastName, String address, String phoneNumber, String createDate) {
@@ -43,8 +32,31 @@ public class UserAccount implements Account {
         this.lastName = lastName;
         this.address = address;
         this.phoneNumber = phoneNumber;
-        this.createDate = createDate;
     }
+
+    protected UserAccount(Parcel in) {
+        uniqueId = in.readString();
+        email = in.readString();
+        pwd = in.readString();
+        firstName = in.readString();
+        lastName = in.readString();
+        address = in.readString();
+        phoneNumber = in.readString();
+        profileLink = in.readString();
+        profilePic = in.readString();
+    }
+
+    public static final Creator<UserAccount> CREATOR = new Creator<UserAccount>() {
+        @Override
+        public UserAccount createFromParcel(Parcel in) {
+            return new UserAccount(in);
+        }
+
+        @Override
+        public UserAccount[] newArray(int size) {
+            return new UserAccount[size];
+        }
+    };
 
     public String getUniqueId() {
         return uniqueId;
@@ -102,22 +114,6 @@ public class UserAccount implements Account {
         this.phoneNumber = phoneNumber;
     }
 
-    public String getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(String createDate) {
-        this.createDate = createDate;
-    }
-
-    public String getProfileId() {
-        return profileId;
-    }
-
-    public void setProfileId(String profileId) {
-        this.profileId = profileId;
-    }
-
     public String getProfileLink() {
         return profileLink;
     }
@@ -126,47 +122,23 @@ public class UserAccount implements Account {
         this.profileLink = profileLink;
     }
 
-    public String getProfileFirstName() {
-        return profileFirstName;
+    public String getProfilePic() {
+        return profilePic;
     }
 
-    public void setProfileFirstName(String profileFirstName) {
-        this.profileFirstName = profileFirstName;
+    public void setProfilePic(String profilePic) {
+        this.profilePic = profilePic;
     }
 
-    public String getProfileLastName() {
-        return profileLastName;
-    }
-
-    public void setProfileLastName(String profileLastName) {
-        this.profileLastName = profileLastName;
-    }
-
-    public String getProfileEmail() {
-        return profileEmail;
-    }
-
-    public void setProfileEmail(String profileEmail) {
-        this.profileEmail = profileEmail;
-    }
-
-    public String getProfilePicUrl() {
-        return profilePicUrl;
-    }
-
-    public void setProfilePicUrl(String profilePicUrl) {
-        this.profilePicUrl = profilePicUrl;
-    }
-
-    @Override
-    public void register() {
-
-    }
-
-    @Override
-    public void login() {
-
-    }
+//    @Override
+//    public void register() {
+//
+//    }
+//
+//    @Override
+//    public void login() {
+//
+//    }
 
     @Override
     public void manageAccount() {
@@ -178,7 +150,7 @@ public class UserAccount implements Account {
 
     }
 
-    public void registerDeleteBike(){
+    public void addDeleteBike(){
 
     }
 
@@ -190,7 +162,25 @@ public class UserAccount implements Account {
 
     }
 
-    public void activateAlarmOnOff(){
+    public void alarmOnOff(){
 
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(uniqueId);
+        dest.writeString(email);
+        dest.writeString(pwd);
+        dest.writeString(firstName);
+        dest.writeString(lastName);
+        dest.writeString(address);
+        dest.writeString(phoneNumber);
+        dest.writeString(profileLink);
+        dest.writeString(profilePic);
     }
 }

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/card_view"
+        android:layout_gravity="center"
+        android:layout_width="fill_parent"
+        android:layout_height="180dp"
+        android:layout_margin="5dp"
+        card_view:cardCornerRadius="2dp"
+        card_view:contentPadding="10dp">
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+            <TextView
+                android:id="@+id/bikeName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:layout_alignParentTop="true"
+                android:hint="@string/prompt_bike_name" />
+
+            <TextView
+                android:id="@+id/bikeNameChange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="80dp"
+                android:hint="@string/prompt_bike_name_change"/>
+
+            <TextView
+                android:id="@+id/bikeId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:textStyle="bold"
+                android:layout_below="@+id/bikeName"
+                android:hint="@string/prompt_bike_id"/>
+
+            <TextView
+                android:id="@+id/bikeIdChange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="80dp"
+                android:layout_below="@+id/bikeName"
+                android:hint="@string/prompt_bike_id_change"/>
+
+            <TextView
+                android:id="@+id/bikeStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:textStyle="bold"
+                android:layout_below="@+id/bikeId"
+                android:hint="@string/prompt_bike_status"/>
+
+            <TextView
+                android:id="@+id/bikeStatusChange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="80dp"
+                android:layout_below="@+id/bikeId"
+                android:hint="@string/prompt_bike_status_change"/>
+
+            <TextView
+                android:id="@+id/bikeAccess"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:textStyle="bold"
+                android:layout_below="@+id/bikeStatus"
+                android:hint="@string/prompt_bike_access"/>
+
+            <TextView
+                android:id="@+id/bikeAccessChange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="80dp"
+                android:layout_below="@+id/bikeStatus"
+                android:hint="@string/prompt_bike_access_change"/>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_primary"
+                android:layout_alignParentBottom="true">
+                <Button
+                    android:id="@+id/track_button"
+                    style="?android:textAppearanceSmall"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:text="@string/action_track_bike"
+                    android:textStyle="bold"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:textColor="@android:color/white" />
+            </FrameLayout>
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>

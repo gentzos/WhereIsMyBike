@@ -71,15 +71,15 @@ public class PoliceAccount implements Account {
         this.phoneNumber = phoneNumber;
     }
 
-    @Override
-    public void register() {
-
-    }
-
-    @Override
-    public void login() {
-
-    }
+//    @Override
+//    public void register() {
+//
+//    }
+//
+//    @Override
+//    public void login() {
+//
+//    }
 
     @Override
     public void manageAccount() {

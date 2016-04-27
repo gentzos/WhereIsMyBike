@@ -5,8 +5,8 @@ package com.aau.wimb.whereismybike;
  */
 public interface Account {
 
-    void register();
-    void login();
+//    void register();
+//    void login();
     void manageAccount();
     void trackBike();
 

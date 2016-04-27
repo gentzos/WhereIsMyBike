@@ -96,8 +96,8 @@ public class UserLoginActivity extends AppCompatActivity {
     private AccessToken accessToken;
     private Profile profile;
 
-    private UserAccount facebookUserAccount;
-    private String profileId = "none";
+//    private UserAccount facebookUserAccount;
+//    private String profileId = "none";
     private String profileLink = "none";
     private String profileFirstName = "none";
     private String profileLastName = "none";
@@ -114,7 +114,7 @@ public class UserLoginActivity extends AppCompatActivity {
         FacebookSdk.sdkInitialize(getApplicationContext());
         mCallbackManager = CallbackManager.Factory.create();
 
-        facebookUserAccount = new UserAccount();
+//        facebookUserAccount = new UserAccount();
 
         // Set up the login form.
         mEmailView = (EditText) findViewById(R.id.email);

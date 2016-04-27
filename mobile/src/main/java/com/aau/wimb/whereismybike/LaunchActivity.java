@@ -34,6 +34,7 @@ import java.security.NoSuchAlgorithmException;
 
 public class LaunchActivity extends AppCompatActivity {
 
+    // To track the tokens
     private AccessTokenTracker mAccessTokenTracker = null;
 
     // Facebook

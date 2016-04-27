@@ -4,6 +4,8 @@
     <string name="title_activity_police">Police</string>
     <string name="title_activity_bike_user_main">My Bicycles</string>
     <string name="title_activity_police_main">Police 1</string>
+    <string name="title_activity_new_bike">New Bike</string>
+    <string name="title_activity_edit_bike">Edit Bike</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -16,7 +18,6 @@
     <string name="prompt_email_cfm">Confirm Email</string>
     <string name="prompt_pwd_cfm">Confirm Password</string>
     <string name="prompt_policeman_id">Policeman Id Number</string>
-
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
     <string name="prompt_police_id">Police Id Number</string>
@@ -35,6 +36,29 @@
 
     <!-- Fragments -->
     <string name="title_fragment_bike_user_account">Manage Account</string>
+    <string name="prompt_bike_name">Name:</string>
+    <string name="prompt_bike_id">ID Number:</string>
+    <string name="prompt_bike_status">Status:</string>
+    <string name="prompt_bike_access">Access To:</string>
+    <string name="prompt_bike_latitude">Latitude:</string>
+    <string name="prompt_bike_longitude">Longitude:</string>
+
+    <string name="prompt_bike_name_change">Bike Name</string>
+    <string name="prompt_bike_id_change">Bike ID</string>
+    <string name="prompt_bike_status_change">Bike Status</string>
+    <string name="prompt_bike_access_change">Bike Access</string>
+    <string name="prompt_bike_latitude_change">Bike Latitude</string>
+    <string name="prompt_bike_longitude_change">Bike Longitude</string>
+
+    <string name="action_track_bike">Track</string>
+    <string name="action_save_bike">Save</string>
+    <string name="action_delete_bike">Delete Bike</string>
+    <string name="action_lock_bike">Lock Bike</string>
+    <string name="action_unlock_bike">Unlock Bike</string>
+    <string name="action_change_name_bike">Change Bike Name</string>
+    <string name="action_allow_bike">Allow Access</string>
+    <string name="action_deny_bike">Deny Access</string>
+
     <string name="title_fragment_bike_user_settings">Settings</string>
     <string name="title_fragment_bike_user_logout">Log out</string>
 
