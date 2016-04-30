@@ -103,13 +103,13 @@ public class UserMainActivity extends AppCompatActivity
 //        mEmail = (TextView)mView.findViewById(R.id.emailView);
 //        mProfileImage = (ImageView)mView.findViewById(R.id.profileImageView);
 
-        Bike obj = new Bike("Black Panther ", "OD2F894NCUJEHDJM", "Locked", "None", "55.650299", "12.540938");
+        Bike obj = new Bike("OD2F894NCUJEHDJM", "csd", "black", true, true, "none", 55.650299, 12.540938);
         bikes.add(0, obj);
-        Bike obj1 = new Bike("Pink Jaguar ", "ODUJEHDJM", "Unlocked", "someone", "65.650299", "65.540938");
+        Bike obj1 = new Bike("OD2F894N", "cd0", "red", false, false, "someone", 65.650299, 22.540938);
         bikes.add(1, obj1);
-        Bike obj2 = new Bike("Pink  ", "DJM", "Locked", "someone", "75.650299", "75.540938");
+        Bike obj2 = new Bike("OD2F894N", "cd2", "pink", true, true, "someone", 75.650299, 32.540938);
         bikes.add(2, obj2);
-        Bike obj3 = new Bike(" Jaguar ", "4NCUJEHDJM", "Unlocked", "None", "85.650299", "85.540938");
+        Bike obj3 = new Bike("OD2F894N", "cd3", "blue", false, false, "none", 85.650299, 42.540938);
         bikes.add(3, obj3);
 
         // Set the home as default

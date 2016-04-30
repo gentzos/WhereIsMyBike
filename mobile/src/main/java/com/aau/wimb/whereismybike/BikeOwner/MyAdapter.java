@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.aau.wimb.whereismybike.Bike;
+import com.aau.wimb.whereismybike.MapsActivity;
 import com.aau.wimb.whereismybike.R;
 
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ public class MyAdapter extends RecyclerView
         .DataObjectHolder> {
 
     public static final String NEW_BIKE = "newBike";
+    public static final String TRACK_BIKE = "trackBike";
     private static String LOG_TAG = "MyAdapter";
 
     private ArrayList<Bike> mDataset;
@@ -33,17 +35,22 @@ public class MyAdapter extends RecyclerView
     public static class DataObjectHolder extends RecyclerView.ViewHolder
             implements View
             .OnClickListener {
-        TextView name;
-        TextView id;
-        TextView status;
-        TextView access;
-        String latitude;
-        String longitude;
+
+        private TextView vin;
+        private TextView brand;
+        private TextView color;
+        private TextView lock;
+        private TextView status;
+        private TextView access;
+        private double latitude;
+        private double longitude;
 
         public DataObjectHolder(View itemView) {
             super(itemView);
-            name = (TextView) itemView.findViewById(R.id.bikeNameChange);
-            id = (TextView) itemView.findViewById(R.id.bikeIdChange);
+            vin = (TextView) itemView.findViewById(R.id.bikeVinChange);
+            brand = (TextView) itemView.findViewById(R.id.bikeBrandChange);
+            color = (TextView) itemView.findViewById(R.id.bikeColorChange);
+            lock = (TextView) itemView.findViewById(R.id.bikeLockChange);
             status = (TextView) itemView.findViewById(R.id.bikeStatusChange);
             access = (TextView) itemView.findViewById(R.id.bikeAccessChange);
             Log.i(LOG_TAG, "Adding Listener");
@@ -52,7 +59,8 @@ public class MyAdapter extends RecyclerView
                 @Override
                 public void onClick(View v) {
                     Intent myIntent = new Intent(v.getContext(),UserBikeActivity.class);
-                    myIntent.putExtra(NEW_BIKE, name.getText() + "-" + id.getText() + "-" + status.getText() + "-" + access.getText() + "-" + latitude + "-" + longitude);
+                    myIntent.putExtra(NEW_BIKE, vin.getText() + "-" + brand.getText() + "-" + color.getText()
+                            + "-" + lock.getText() + "-" + status.getText() + "-" + access.getText() + "-" + latitude + "-" + longitude);
                     v.getContext().startActivity(myIntent);
                 }
             });
@@ -84,8 +92,11 @@ public class MyAdapter extends RecyclerView
         mTrackButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Snackbar.make(v, "Replace with your own action " + dataObjectHolder.latitude + " " + dataObjectHolder.longitude, Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent myIntent = new Intent(v.getContext(),MapsActivity.class);
+                myIntent.putExtra(TRACK_BIKE, dataObjectHolder.vin.getText() + "-" + dataObjectHolder.latitude + "-" + dataObjectHolder.longitude);
+                v.getContext().startActivity(myIntent);
+//                Snackbar.make(v, "Replace with your own action " + dataObjectHolder.latitude + " " + dataObjectHolder.longitude, Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
             }
         });
 
@@ -94,24 +105,36 @@ public class MyAdapter extends RecyclerView
 
     @Override
     public void onBindViewHolder(DataObjectHolder holder, int position) {
-        holder.name.setText(mDataset.get(position).getName());
-        holder.id.setText(mDataset.get(position).getId());
-        holder.status.setText(mDataset.get(position).getStatus());
-        holder.access.setText(mDataset.get(position).getAccess());
-        holder.latitude = mDataset.get(position).getLatitude();
-        holder.longitude = mDataset.get(position).getLongitude();
+        holder.vin.setText(mDataset.get(position).getVin());
+        holder.brand.setText(mDataset.get(position).getBrand());
+        holder.color.setText(mDataset.get(position).getColor());
 
-        if (holder.status.getText().equals("Locked")){
-            holder.status.setTextColor(holder.itemView.getResources().getColor(R.color.colorPrimary));
+        if (mDataset.get(position).isLock() == true){
+            holder.lock.setText("Locked");
+            holder.lock.setTextColor(holder.itemView.getResources().getColor(R.color.colorPrimary));
         } else {
-            holder.status.setTextColor(holder.itemView.getResources().getColor(R.color.colorAccent));
+            holder.lock.setText("Unlocked");
+            holder.lock.setTextColor(holder.itemView.getResources().getColor(R.color.colorAccent));
         }
 
-        if (holder.access.getText().equals("None")){
+        if (mDataset.get(position).isStatus() == true){
+            holder.status.setText("Stolen");
+            holder.status.setTextColor(holder.itemView.getResources().getColor(R.color.colorAccent));
+        } else {
+            holder.status.setText("Safe");
+            holder.status.setTextColor(holder.itemView.getResources().getColor(R.color.colorPrimary));
+        }
+
+        if (mDataset.get(position).getAccess().equals("none")){
+            holder.access.setText("None");
             holder.access.setTextColor(holder.itemView.getResources().getColor(R.color.colorPrimary));
         } else {
+            holder.access.setText("Someone");
             holder.access.setTextColor(holder.itemView.getResources().getColor(R.color.colorAccent));
         }
+
+        holder.latitude = mDataset.get(position).getLatitude();
+        holder.longitude = mDataset.get(position).getLongitude();
     }
 
     public void addItem(Bike dataObj, int index) {

@@ -26,6 +26,12 @@ import android.widget.TextView;
 
 import com.aau.wimb.whereismybike.R;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
@@ -104,11 +110,18 @@ public class UserLoginActivity extends AppCompatActivity {
     private String profileEmail = "none";
     private String profilePicUrl = "none";
 
+    private RequestQueue queue;
+    private String url;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_login);
         setupActionBar();
+
+        // Instantiate the RequestQueue. It is for the database!
+        queue = Volley.newRequestQueue(this);
+//        url ="http://localhost:3000/profile?ID=1234&fName=Bob&lName=Bobson";
 
         // Facebook Initialize.
         FacebookSdk.sdkInitialize(getApplicationContext());
@@ -174,45 +187,12 @@ public class UserLoginActivity extends AppCompatActivity {
         mAccessTokenTracker.startTracking();
         mProfileTracker.startTracking();
 
-        if (AccessToken.getCurrentAccessToken() != null) {
-            mAccessTokenTracker = new AccessTokenTracker() {
-                @Override
-                protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
-                    mAccessTokenTracker.stopTracking();
-                    if(currentAccessToken == null) {
-                        //(the user has revoked your permissions -
-                        //by going to his settings and deleted your app)
-                        //do the simple login to FaceBook
-                        fbInfo.setText("You have been signed out, please login again.");
-                    }
-                    else {
-                        //you've got the new access token now.
-                        //AccessToken.getToken() could be same for both
-                        //parameters but you should only use "currentAccessToken"
-
-                        if(Profile.getCurrentProfile() != null) {
-                            mProfile = Profile.getCurrentProfile();
-
-                            mBundle = new Bundle();
-                            mBundle.putParcelable(PARCEL_KEY, Profile.getCurrentProfile());
-
-                            Intent myIntent = new Intent(UserLoginActivity.this,UserMainActivity.class);
-                            myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            myIntent.putExtras(mBundle);
-                            UserLoginActivity.this.startActivity(myIntent);
-                            finish();
-                        }
-                    }
-                }
-            };
-            AccessToken.refreshCurrentAccessTokenAsync();
-        }
+        AccessToken();
 
         mFacebookButton.setReadPermissions("email");
         mFacebookButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-
                 mAccessToken = loginResult.getAccessToken();
                 mProfile = Profile.getCurrentProfile();
 
@@ -222,14 +202,7 @@ public class UserLoginActivity extends AppCompatActivity {
                 editor.putString("userLogin","true");
                 editor.apply();
 
-                mBundle = new Bundle();
-                mBundle.putParcelable(PARCEL_KEY, mProfile);
-
-                Intent myIntent = new Intent(UserLoginActivity.this,UserMainActivity.class);
-                myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                myIntent.putExtras(mBundle);
-                UserLoginActivity.this.startActivity(myIntent);
-                finish();
+                AccessToken();
             }
 
             @Override
@@ -437,6 +410,62 @@ public class UserLoginActivity extends AppCompatActivity {
         protected void onCancelled() {
             mAuthTask = null;
             showProgress(false);
+        }
+    }
+
+    private void AccessToken(){
+        if (AccessToken.getCurrentAccessToken() != null) {
+            mAccessTokenTracker = new AccessTokenTracker() {
+                @Override
+                protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
+                    mAccessTokenTracker.stopTracking();
+                    if(currentAccessToken == null) {
+                        //(the user has revoked your permissions -
+                        //by going to his settings and deleted your app)
+                        //do the simple login to FaceBook
+                        fbInfo.setText("You have been signed out, please login again.");
+                    }
+                    else {
+                        //you've got the new access token now.
+                        //AccessToken.getToken() could be same for both
+                        //parameters but you should only use "currentAccessToken"
+
+                        if(Profile.getCurrentProfile() != null) {
+                            mProfile = Profile.getCurrentProfile();
+
+                            url ="http://localhost:3000/profile?ID=" + mProfile.getId().toUpperCase() + "&fName=" + mProfile.getFirstName().toLowerCase() + "&lName=" + mProfile.getLastName().toLowerCase();
+
+                            // Request a string response from the provided URL.
+                            StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                                    new Response.Listener<String>() {
+                                        @Override
+                                        public void onResponse(String response) {
+                                            // Display the first 500 characters of the response string.
+                                            Log.e("Database", "Response is: "+ response.substring(0,500));
+                                        }
+                                    }, new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    Log.e("Database", "That didn't work!");
+                                }
+                            });
+                            // Add the request to the RequestQueue.
+                            queue.add(stringRequest);
+
+
+                            mBundle = new Bundle();
+                            mBundle.putParcelable(PARCEL_KEY, Profile.getCurrentProfile());
+
+                            Intent myIntent = new Intent(UserLoginActivity.this,UserMainActivity.class);
+                            myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            myIntent.putExtras(mBundle);
+                            UserLoginActivity.this.startActivity(myIntent);
+                            finish();
+                        }
+                    }
+                }
+            };
+            AccessToken.refreshCurrentAccessTokenAsync();
         }
     }
 }

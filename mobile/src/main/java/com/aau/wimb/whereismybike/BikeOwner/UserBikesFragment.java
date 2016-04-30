@@ -196,7 +196,7 @@ public class UserBikesFragment extends Fragment {
     private ArrayList<Bike> getDataSet() {
         ArrayList results = new ArrayList<Bike>();
         for (int index = 0; index < 1; index++) {
-            Bike obj = new Bike("Black Panther ", "OD2F894NCUJEHDJM", "Locked", "None", "55.650299", "12.540938");
+            Bike obj = new Bike("OD2F894NCUJEHDJM", "csd", "csd", true, true, "None", 55.650299, 12.540938);
             results.add(index, obj);
         }
         return results;

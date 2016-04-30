@@ -9,7 +9,7 @@
         android:id="@+id/card_view"
         android:layout_gravity="center"
         android:layout_width="fill_parent"
-        android:layout_height="180dp"
+        android:layout_height="230dp"
         android:layout_margin="5dp"
         card_view:cardCornerRadius="2dp"
         card_view:contentPadding="10dp">
@@ -19,55 +19,73 @@
             android:layout_height="fill_parent">
 
             <TextView
-                android:id="@+id/bikeName"
+                android:id="@+id/bikeVin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textStyle="bold"
                 android:layout_alignParentTop="true"
-                android:hint="@string/prompt_bike_name" />
+                android:textStyle="bold"
+                android:hint="@string/prompt_bike_vin"/>
 
             <TextView
-                android:id="@+id/bikeNameChange"
+                android:id="@+id/bikeVinChange"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="80dp"
-                android:hint="@string/prompt_bike_name_change"/>
+                android:layout_marginLeft="85dp"
+                android:hint="@string/prompt_bike_vin_change"/>
 
             <TextView
-                android:id="@+id/bikeId"
+                android:id="@+id/bikeBrand"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:textStyle="bold"
-                android:layout_below="@+id/bikeName"
-                android:hint="@string/prompt_bike_id"/>
+                android:layout_below="@+id/bikeVin"
+                android:hint="@string/prompt_bike_brand" />
 
             <TextView
-                android:id="@+id/bikeIdChange"
+                android:id="@+id/bikeBrandChange"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:layout_marginLeft="80dp"
-                android:layout_below="@+id/bikeName"
-                android:hint="@string/prompt_bike_id_change"/>
+                android:layout_marginLeft="85dp"
+                android:layout_below="@+id/bikeVinChange"
+                android:hint="@string/prompt_bike_brand_change"/>
 
             <TextView
-                android:id="@+id/bikeStatus"
+                android:id="@+id/bikeColor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:textStyle="bold"
-                android:layout_below="@+id/bikeId"
-                android:hint="@string/prompt_bike_status"/>
+                android:layout_below="@+id/bikeBrand"
+                android:hint="@string/prompt_bike_color"/>
 
             <TextView
-                android:id="@+id/bikeStatusChange"
+                android:id="@+id/bikeColorChange"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:layout_marginLeft="80dp"
-                android:layout_below="@+id/bikeId"
-                android:hint="@string/prompt_bike_status_change"/>
+                android:layout_marginLeft="85dp"
+                android:layout_below="@+id/bikeBrandChange"
+                android:hint="@string/prompt_bike_color_change"/>
+
+            <TextView
+                android:id="@+id/bikeLock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:textStyle="bold"
+                android:layout_below="@+id/bikeColor"
+                android:hint="@string/prompt_bike_lock"/>
+
+            <TextView
+                android:id="@+id/bikeLockChange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="85dp"
+                android:layout_below="@+id/bikeColorChange"
+                android:hint="@string/prompt_bike_lock_change"/>
 
             <TextView
                 android:id="@+id/bikeAccess"
@@ -75,7 +93,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:textStyle="bold"
-                android:layout_below="@+id/bikeStatus"
+                android:layout_below="@+id/bikeLock"
                 android:hint="@string/prompt_bike_access"/>
 
             <TextView
@@ -83,9 +101,27 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:layout_marginLeft="80dp"
-                android:layout_below="@+id/bikeStatus"
+                android:layout_marginLeft="85dp"
+                android:layout_below="@+id/bikeLockChange"
                 android:hint="@string/prompt_bike_access_change"/>
+
+            <TextView
+                android:id="@+id/bikeStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:textStyle="bold"
+                android:layout_below="@+id/bikeAccess"
+                android:hint="@string/prompt_bike_status"/>
+
+            <TextView
+                android:id="@+id/bikeStatusChange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="85dp"
+                android:layout_below="@+id/bikeAccessChange"
+                android:hint="@string/prompt_bike_status_change"/>
 
             <FrameLayout
                 android:layout_width="match_parent"
