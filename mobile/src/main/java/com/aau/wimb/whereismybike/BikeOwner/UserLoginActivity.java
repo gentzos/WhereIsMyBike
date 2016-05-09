@@ -557,8 +557,7 @@ public class UserLoginActivity extends AppCompatActivity {
 
         mBundle = new Bundle();
         mBundle.putParcelable(FBLOGIN_KEY, profile);
-//        mBundle.putString(BIKE_KEY, bikeString);
-//        Log.e("Response222222222", bikeString + " nooooo");
+//        mBundle.putString(BIKE_KEY, bikeS + " nooooo");
 
         Intent myIntent = new Intent(UserLoginActivity.this, UserMainActivity.class);
         myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
