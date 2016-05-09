@@ -3,11 +3,11 @@ package com.aau.wimb.whereismybike.BikeOwner;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.preference.PreferenceManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 
 import android.os.AsyncTask;
@@ -23,13 +23,17 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.aau.wimb.whereismybike.R;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.facebook.AccessToken;
@@ -40,17 +44,18 @@ import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
-import com.facebook.HttpMethod;
 import com.facebook.Profile;
 import com.facebook.ProfileTracker;
-import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,18 +65,12 @@ import java.util.Map;
 public class UserLoginActivity extends AppCompatActivity {
 
     /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
-    /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private UserLoginTask mAuthTask = null;
 
-    public static final String PARCEL_KEY = "parcel_key";
+    public static final String FBLOGIN_KEY = "fblogin_key";
+    public static final String BIKE_KEY = "bike_key";
 
     // UI references.
     private EditText mEmailView;
@@ -82,6 +81,7 @@ public class UserLoginActivity extends AppCompatActivity {
     private Button mRegisterButton;
     private Button mForgotPasswordButton;
     private LoginButton mFacebookButton;
+    private View focusView = null;
 
     private TextView fbInfo;
 
@@ -91,27 +91,18 @@ public class UserLoginActivity extends AppCompatActivity {
     private SharedPreferences.Editor editor;
 
     private Bundle mBundle;
+    private String bikeString;
 
     // Facebook
     private CallbackManager mCallbackManager = null;
     private AccessTokenTracker mAccessTokenTracker = null;
     private ProfileTracker mProfileTracker = null;
-    private AccessToken mAccessToken = null;
-    private Profile mProfile = null;
-
-    private AccessToken accessToken;
-    private Profile profile;
-
-//    private UserAccount facebookUserAccount;
-//    private String profileId = "none";
-    private String profileLink = "none";
-    private String profileFirstName = "none";
-    private String profileLastName = "none";
-    private String profileEmail = "none";
-    private String profilePicUrl = "none";
 
     private RequestQueue queue;
-    private String url;
+
+    // json object response url
+    private String urlJsonObjLogin = "http://192.168.0.103:3000/wimb/login";
+    private String urlJsonObjFb = "http://192.168.0.103:3000/wimb/facebookLogin";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,7 +131,7 @@ public class UserLoginActivity extends AppCompatActivity {
         mForgotPasswordButton = (Button) findViewById(R.id.forgot_pwd_button);
 
         // Facebook login.
-        fbInfo = (TextView)findViewById(R.id.info);
+        fbInfo = (TextView) findViewById(R.id.info);
         mFacebookButton = (LoginButton) findViewById(R.id.facebook_login);
 
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -157,7 +148,7 @@ public class UserLoginActivity extends AppCompatActivity {
         mRegisterButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent myIntent = new Intent(UserLoginActivity.this,UserRegisterActivity.class);
+                Intent myIntent = new Intent(UserLoginActivity.this, UserRegisterActivity.class);
 //                startActivityForResult(myIntent,3);
                 UserLoginActivity.this.startActivity(myIntent);
             }
@@ -170,40 +161,64 @@ public class UserLoginActivity extends AppCompatActivity {
             }
         });
 
-        mAccessTokenTracker = new AccessTokenTracker() {
-            @Override
-            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
-                Log.e("WiMB", "Access Token " + currentAccessToken);
-            }
-        };
-
-        mProfileTracker = new ProfileTracker() {
-            @Override
-            protected void onCurrentProfileChanged(Profile oldProfile, Profile currentProfile) {
-                Log.e("WiMB", "Profile " + currentProfile);
-            }
-        };
-
-        mAccessTokenTracker.startTracking();
-        mProfileTracker.startTracking();
+//        mAccessTokenTracker = new AccessTokenTracker() {
+//            @Override
+//            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
+//                Log.e("WiMB", "Access Token " + currentAccessToken);
+//            }
+//        };
+//
+//        mProfileTracker = new ProfileTracker() {
+//            @Override
+//            protected void onCurrentProfileChanged(Profile oldProfile, Profile currentProfile) {
+//                Log.e("WiMB", "Profile " + currentProfile);
+//            }
+//        };
+//
+//        mAccessTokenTracker.startTracking();
+//        mProfileTracker.startTracking();
 
         AccessToken();
 
         mFacebookButton.setReadPermissions("email");
         mFacebookButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
+
             @Override
             public void onSuccess(LoginResult loginResult) {
-                mAccessToken = loginResult.getAccessToken();
-                mProfile = Profile.getCurrentProfile();
-
-                // User signed in.
-                preferences = PreferenceManager.getDefaultSharedPreferences(UserLoginActivity.this);
-                editor = preferences.edit();
-                editor.putString("userLogin","true");
-                editor.apply();
-
-                AccessToken();
+                if (Profile.getCurrentProfile() == null) {
+                    mProfileTracker = new ProfileTracker() {
+                        @Override
+                        protected void onCurrentProfileChanged(Profile profile, Profile profile2) {
+                            // profile2 is the new profile
+                            Log.v("facebook - profile", profile2.getFirstName());
+                            Redirect(profile2);
+                            mProfileTracker.stopTracking();
+                        }
+                    };
+                    mProfileTracker.startTracking();
+                } else {
+                    Profile profile = Profile.getCurrentProfile();
+                    Log.v("facebook - profile", profile.getFirstName());
+                    Redirect(profile);
+                }
             }
+
+
+//            @Override
+//            public void onSuccess(LoginResult loginResult) {
+//                mAccessToken = loginResult.getAccessToken();
+//                mProfile = Profile.getCurrentProfile();
+//                Log.e("WiMB", "THIS ACCESS " + mAccessToken);
+//                Log.e("WiMB", "THIS PROFILE " + mProfile);
+//
+//                // User signed in. Use in LaunchActivity to jump to LoginActivity.
+//                preferences = PreferenceManager.getDefaultSharedPreferences(UserLoginActivity.this);
+//                editor = preferences.edit();
+//                editor.putString("userLogin","true");
+//                editor.apply();
+//
+//                AccessToken();
+//            }
 
             @Override
             public void onCancel() {
@@ -234,8 +249,8 @@ public class UserLoginActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
-        mAccessTokenTracker.stopTracking();
-        mProfileTracker.stopTracking();
+//        mAccessTokenTracker.stopTracking();
+//        mProfileTracker.stopTracking();
     }
 
     /**
@@ -268,14 +283,13 @@ public class UserLoginActivity extends AppCompatActivity {
         String password = mPasswordView.getText().toString();
 
         boolean cancel = false;
-        View focusView = null;
 
         // Check for a valid password, if the user entered one.
         if (TextUtils.isEmpty(password)) {
             mPasswordView.setError(getString(R.string.error_field_required));
             focusView = mPasswordView;
             cancel = true;
-        } else if(!isPasswordValid(password)) {
+        } else if (!isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
@@ -352,13 +366,13 @@ public class UserLoginActivity extends AppCompatActivity {
     }
 
     /**
-     * Represents an asynchronous login/registration task used to authenticate
+     * Represents an asynchronous login task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    private class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
-        private final String mEmail;
-        private final String mPassword;
+        String mEmail;
+        String mPassword;
 
         UserLoginTask(String email, String password) {
             mEmail = email;
@@ -367,24 +381,30 @@ public class UserLoginActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
-
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
+            /**
+             * Gets current device state and checks for working internet
+             * connection by trying Google.
+             **/
+            ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo netInfo = cm.getActiveNetworkInfo();
+            if (netInfo != null && netInfo.isConnected()) {
+                try {
+                    URL url = new URL("http://www.google.com");
+                    HttpURLConnection urlc = (HttpURLConnection) url
+                            .openConnection();
+                    urlc.setConnectTimeout(3000);
+                    urlc.connect();
+                    if (urlc.getResponseCode() == 200) {
+                        return true;
+                    }
+                } catch (MalformedURLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 }
             }
-
-            // TODO: register the new account here.
             return false;
         }
 
@@ -394,15 +414,64 @@ public class UserLoginActivity extends AppCompatActivity {
             showProgress(false);
 
             if (success) {
-                Intent myIntent = new Intent(UserLoginActivity.this,UserMainActivity.class);
-//                setResult(2);
-                myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                UserLoginActivity.this.startActivity(myIntent);
-                finish();
+//                Intent myIntent = new Intent(UserLoginActivity.this, UserMainActivity.class);
+////                setResult(2);
+//                myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                UserLoginActivity.this.startActivity(myIntent);
+//                finish();
+//                mEmailView = (EditText) findViewById(R.id.email);
+                mEmail = mEmailView.getText().toString();
+                mPassword = mPasswordView.getText().toString();
+
+                StringRequest postRequest = new StringRequest(Request.Method.POST, urlJsonObjLogin,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                // response
+                                Log.e("Response", response);
+
+                                if (response.equals("Success")) {
+//                                    mBundle = new Bundle();
+//                                    mBundle.putParcelable(PARCEL_KEY, profile);
+
+                                    Intent myIntent = new Intent(UserLoginActivity.this, UserMainActivity.class);
+                                    myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                                    myIntent.putExtras(mBundle);
+                                    UserLoginActivity.this.startActivity(myIntent);
+                                    finish();
+                                } else {
+                                    mEmailView.setError(getString(R.string.error_incorrect_email));
+                                    mPasswordView.setError(getString(R.string.error_incorrect_password));
+                                    focusView = mEmailView;
+                                    focusView = mPasswordView;
+                                }
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                // error
+                                Log.e("Error.Response", String.valueOf(error));
+                            }
+                        }
+                ) {
+                    @Override
+                    protected Map<String, String> getParams() {
+                        Map<String, String> params = new HashMap<String, String>();
+                        params.put("email", mEmail);
+                        params.put("password", mPassword);
+
+                        return params;
+                    }
+                };
+                queue.add(postRequest);
             } else {
-                mEmailView.setError(getString(R.string.error_incorrect_email));
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
+                Toast.makeText(getApplicationContext(),
+                        "Error in Network Connection", Toast.LENGTH_SHORT)
+                        .show();
+//                mEmailView.setError(getString(R.string.error_incorrect_email));
+//                mPasswordView.setError(getString(R.string.error_incorrect_password));
+//                mPasswordView.requestFocus();
             }
         }
 
@@ -413,59 +482,88 @@ public class UserLoginActivity extends AppCompatActivity {
         }
     }
 
-    private void AccessToken(){
+    // A method to check if there is a valid access token for Facebook Login.
+    private void AccessToken() {
         if (AccessToken.getCurrentAccessToken() != null) {
             mAccessTokenTracker = new AccessTokenTracker() {
                 @Override
                 protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
                     mAccessTokenTracker.stopTracking();
-                    if(currentAccessToken == null) {
+                    if (currentAccessToken == null) {
                         //(the user has revoked your permissions -
                         //by going to his settings and deleted your app)
                         //do the simple login to FaceBook
                         fbInfo.setText("You have been signed out, please login again.");
-                    }
-                    else {
+                    } else {
                         //you've got the new access token now.
                         //AccessToken.getToken() could be same for both
                         //parameters but you should only use "currentAccessToken"
 
-                        if(Profile.getCurrentProfile() != null) {
-                            mProfile = Profile.getCurrentProfile();
-
-                            url ="http://localhost:3000/profile?ID=" + mProfile.getId().toUpperCase() + "&fName=" + mProfile.getFirstName().toLowerCase() + "&lName=" + mProfile.getLastName().toLowerCase();
-
-                            // Request a string response from the provided URL.
-                            StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                                    new Response.Listener<String>() {
-                                        @Override
-                                        public void onResponse(String response) {
-                                            // Display the first 500 characters of the response string.
-                                            Log.e("Database", "Response is: "+ response.substring(0,500));
-                                        }
-                                    }, new Response.ErrorListener() {
-                                @Override
-                                public void onErrorResponse(VolleyError error) {
-                                    Log.e("Database", "That didn't work!");
-                                }
-                            });
-                            // Add the request to the RequestQueue.
-                            queue.add(stringRequest);
+                        GraphRequest request = GraphRequest.newMeRequest(
+                                AccessToken.getCurrentAccessToken(),
+                                new GraphRequest.GraphJSONObjectCallback() {
+                                    @Override
+                                    public void onCompleted(JSONObject object, GraphResponse response) {
+                                        // this is where you should have the profile
+                                        Log.v("fetched info", object.toString());
+                                        Redirect(Profile.getCurrentProfile());
+                                    }
+                                });
+                        Bundle parameters = new Bundle();
+                        parameters.putString("fields", "id,first_name,last_name,link,email"); //write the fields you need
+                        request.setParameters(parameters);
+                        request.executeAsync();
 
 
-                            mBundle = new Bundle();
-                            mBundle.putParcelable(PARCEL_KEY, Profile.getCurrentProfile());
-
-                            Intent myIntent = new Intent(UserLoginActivity.this,UserMainActivity.class);
-                            myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            myIntent.putExtras(mBundle);
-                            UserLoginActivity.this.startActivity(myIntent);
-                            finish();
-                        }
                     }
                 }
             };
+            mAccessTokenTracker.startTracking();
             AccessToken.refreshCurrentAccessTokenAsync();
         }
+    }
+
+    // Communicate with database and redirect to MainActivity.
+    private void Redirect(final Profile profile) {
+
+        StringRequest postRequest = new StringRequest(Request.Method.POST, urlJsonObjFb,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // response
+                        bikeString = response;
+                        Log.e("Response", response);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // error
+                        Log.e("Error.Response", String.valueOf(error));
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("_id", profile.getId().toUpperCase());
+                params.put("fName", profile.getFirstName().toLowerCase());
+                params.put("lName", profile.getLastName().toLowerCase());
+
+                return params;
+            }
+        };
+        queue.add(postRequest);
+
+        mBundle = new Bundle();
+        mBundle.putParcelable(FBLOGIN_KEY, profile);
+//        mBundle.putString(BIKE_KEY, bikeString);
+//        Log.e("Response222222222", bikeString + " nooooo");
+
+        Intent myIntent = new Intent(UserLoginActivity.this, UserMainActivity.class);
+        myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        myIntent.putExtras(mBundle);
+        UserLoginActivity.this.startActivity(myIntent);
+        finish();
     }
 }

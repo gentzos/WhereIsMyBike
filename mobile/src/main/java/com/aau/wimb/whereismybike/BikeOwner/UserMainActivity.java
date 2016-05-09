@@ -62,6 +62,7 @@ public class UserMainActivity extends AppCompatActivity
     private Fragment fragment;
     private FragmentManager fragmentManager;
     private int id;
+    private String bikeString;
 
     private TextView mName;
     private TextView mEmail;
@@ -120,7 +121,10 @@ public class UserMainActivity extends AppCompatActivity
                 .commit();
 
         if (mBundle != null) {
-            mProfile = (Profile) mBundle.getParcelable(UserLoginActivity.PARCEL_KEY);
+            mProfile = (Profile) mBundle.getParcelable(UserLoginActivity.FBLOGIN_KEY);
+//            bikeString = mBundle.getString(UserLoginActivity.BIKE_KEY);
+
+//            Log.e("NEWWWWW", bikeString + " ll");
 
             user.setUniqueId(mProfile.getId());
             user.setProfileLink(mProfile.getLinkUri().toString());

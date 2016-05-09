@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
     tools:context=".BikeOwner.UserBikeActivity">
 
     <ScrollView
-        android:id="@+id/register_bike_scroll"
+        android:id="@+id/normal_bike_scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -15,115 +17,115 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:paddingTop="@dimen/activity_vertical_margin"
             android:paddingBottom="@dimen/activity_vertical_margin"
             android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:paddingTop="@dimen/activity_vertical_margin">
+            android:paddingRight="@dimen/activity_horizontal_margin">
 
             <TextView
                 android:id="@+id/bikeVin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                android:textStyle="bold"
-                android:hint="@string/prompt_bike_vin"/>
+                android:hint="@string/prompt_bike_vin"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/bikeVinChange"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="85dp"
-                android:hint="@string/prompt_bike_vin_change"/>
+                android:hint="@string/prompt_bike_vin_change" />
 
             <TextView
                 android:id="@+id/bikeBrand"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:textStyle="bold"
                 android:layout_below="@+id/bikeVin"
-                android:hint="@string/prompt_bike_brand" />
+                android:layout_marginTop="10dp"
+                android:hint="@string/prompt_bike_brand"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/bikeBrandChange"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginLeft="85dp"
                 android:layout_below="@+id/bikeVinChange"
-                android:hint="@string/prompt_bike_brand_change"/>
+                android:layout_marginLeft="85dp"
+                android:layout_marginTop="10dp"
+                android:hint="@string/prompt_bike_brand_change" />
 
             <TextView
                 android:id="@+id/bikeColor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:textStyle="bold"
                 android:layout_below="@+id/bikeBrand"
-                android:hint="@string/prompt_bike_color"/>
+                android:layout_marginTop="10dp"
+                android:hint="@string/prompt_bike_color"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/bikeColorChange"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginLeft="85dp"
                 android:layout_below="@+id/bikeBrandChange"
-                android:hint="@string/prompt_bike_color_change"/>
+                android:layout_marginLeft="85dp"
+                android:layout_marginTop="10dp"
+                android:hint="@string/prompt_bike_color_change" />
 
             <TextView
                 android:id="@+id/bikeLock"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:textStyle="bold"
                 android:layout_below="@+id/bikeColor"
-                android:hint="@string/prompt_bike_lock"/>
+                android:layout_marginTop="10dp"
+                android:hint="@string/prompt_bike_lock"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/bikeLockChange"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginLeft="85dp"
                 android:layout_below="@+id/bikeColorChange"
-                android:hint="@string/prompt_bike_lock_change"/>
+                android:layout_marginLeft="85dp"
+                android:layout_marginTop="10dp"
+                android:hint="@string/prompt_bike_lock_change" />
 
             <TextView
                 android:id="@+id/bikeAccess"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:textStyle="bold"
                 android:layout_below="@+id/bikeLock"
-                android:hint="@string/prompt_bike_access"/>
+                android:layout_marginTop="10dp"
+                android:hint="@string/prompt_bike_access"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/bikeAccessChange"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginLeft="85dp"
                 android:layout_below="@+id/bikeLockChange"
-                android:hint="@string/prompt_bike_access_change"/>
+                android:layout_marginLeft="85dp"
+                android:layout_marginTop="10dp"
+                android:hint="@string/prompt_bike_access_change" />
 
             <TextView
                 android:id="@+id/bikeStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:textStyle="bold"
                 android:layout_below="@+id/bikeAccess"
-                android:hint="@string/prompt_bike_status"/>
+                android:layout_marginTop="10dp"
+                android:hint="@string/prompt_bike_status"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/bikeStatusChange"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginLeft="85dp"
                 android:layout_below="@+id/bikeAccessChange"
-                android:hint="@string/prompt_bike_status_change"/>
+                android:layout_marginLeft="85dp"
+                android:layout_marginTop="10dp"
+                android:hint="@string/prompt_bike_status_change" />
 
             <TextView
                 android:id="@+id/bikeLatitude"
@@ -132,16 +134,16 @@
                 android:layout_below="@+id/bikeStatus"
                 android:layout_marginTop="10dp"
                 android:hint="@string/prompt_bike_latitude"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/bikeLatitudeChange"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/bikeStatusChange"
-                android:layout_marginTop="10dp"
                 android:layout_marginLeft="85dp"
-                android:hint="@string/prompt_bike_latitude_change"/>
+                android:layout_marginTop="10dp"
+                android:hint="@string/prompt_bike_latitude_change" />
 
             <TextView
                 android:id="@+id/bikeLongitude"
@@ -150,162 +152,187 @@
                 android:layout_below="@+id/bikeLatitude"
                 android:layout_marginTop="10dp"
                 android:hint="@string/prompt_bike_longitude"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/bikeLongitudeChange"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/bikeLatitude"
-                android:layout_marginTop="10dp"
                 android:layout_marginLeft="85dp"
-                android:hint="@string/prompt_bike_longitude_change"/>
+                android:layout_marginTop="10dp"
+                android:hint="@string/prompt_bike_longitude_change" />
 
             <FrameLayout
                 android:id="@+id/save_button_frame"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/button_primary"
                 android:layout_below="@+id/bikeLongitudeChange"
-                android:layout_marginTop="20dp">
+                android:layout_marginTop="20dp"
+                android:background="@drawable/button_primary">
+
                 <Button
                     android:id="@+id/save_button"
                     style="?android:textAppearanceSmall"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:text="@string/action_save_bike"
-                    android:textStyle="bold"
                     android:background="?android:attr/selectableItemBackground"
-                    android:textColor="@android:color/white" />
+                    android:text="@string/action_save_bike"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold" />
             </FrameLayout>
 
             <FrameLayout
                 android:id="@+id/lock_button_frame"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/button_accent"
                 android:layout_below="@+id/bikeLongitudeChange"
-                android:layout_marginTop="20dp">
+                android:layout_marginTop="20dp"
+                android:background="@drawable/button_accent">
+
                 <Button
                     android:id="@+id/lock_button"
                     style="?android:textAppearanceSmall"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:text="@string/action_lock_bike"
-                    android:textStyle="bold"
                     android:background="?android:attr/selectableItemBackground"
-                    android:textColor="@android:color/white" />
+                    android:text="@string/action_lock_bike"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold" />
             </FrameLayout>
 
             <FrameLayout
                 android:id="@+id/unlock_button_frame"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/button_primary"
                 android:layout_below="@+id/bikeLongitudeChange"
-                android:layout_marginTop="20dp">
+                android:layout_marginTop="20dp"
+                android:background="@drawable/button_primary">
+
                 <Button
                     android:id="@+id/unlock_button"
                     style="?android:textAppearanceSmall"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:text="@string/action_unlock_bike"
-                    android:textStyle="bold"
                     android:background="?android:attr/selectableItemBackground"
-                    android:textColor="@android:color/white" />
+                    android:text="@string/action_unlock_bike"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold" />
             </FrameLayout>
 
             <FrameLayout
                 android:id="@+id/allow_button_frame"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/button_primary_dark"
-                android:layout_below="@+id/bikeLongitudeChange"
                 android:layout_alignParentRight="true"
-                android:layout_marginTop="70dp">
+                android:layout_below="@+id/bikeLongitudeChange"
+                android:layout_marginTop="70dp"
+                android:background="@drawable/button_primary_dark">
+
                 <Button
                     android:id="@+id/allow_button"
                     style="?android:textAppearanceSmall"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:text="@string/action_allow_bike"
-                    android:textStyle="bold"
                     android:background="?android:attr/selectableItemBackground"
-                    android:textColor="@android:color/white" />
+                    android:text="@string/action_allow_bike"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold" />
             </FrameLayout>
 
             <FrameLayout
                 android:id="@+id/deny_button_frame"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/button_accent"
-                android:layout_below="@+id/bikeLongitudeChange"
                 android:layout_alignParentRight="true"
-                android:layout_marginTop="70dp">
+                android:layout_below="@+id/bikeLongitudeChange"
+                android:layout_marginTop="70dp"
+                android:background="@drawable/button_accent">
+
                 <Button
                     android:id="@+id/deny_button"
                     style="?android:textAppearanceSmall"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:text="@string/action_deny_bike"
-                    android:textStyle="bold"
                     android:background="?android:attr/selectableItemBackground"
-                    android:textColor="@android:color/white" />
+                    android:text="@string/action_deny_bike"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold" />
             </FrameLayout>
 
             <FrameLayout
                 android:id="@+id/stolen_button_frame"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/button_primary_dark"
                 android:layout_below="@+id/bikeLongitudeChange"
-                android:layout_marginTop="150dp">
+                android:layout_marginTop="150dp"
+                android:background="@drawable/button_primary_dark">
+
                 <Button
                     android:id="@+id/stolen_button"
                     style="?android:textAppearanceSmall"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:text="@string/action_stolen_bike"
-                    android:textStyle="bold"
                     android:background="?android:attr/selectableItemBackground"
-                    android:textColor="@android:color/white" />
+                    android:text="@string/action_stolen_bike"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold" />
             </FrameLayout>
 
             <FrameLayout
                 android:id="@+id/found_button_frame"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/button_accent"
                 android:layout_below="@+id/bikeLongitudeChange"
-                android:layout_marginTop="150dp">
+                android:layout_marginTop="150dp"
+                android:background="@drawable/button_accent">
+
                 <Button
                     android:id="@+id/found_button"
                     style="?android:textAppearanceSmall"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:text="@string/action_found_bike"
-                    android:textStyle="bold"
                     android:background="?android:attr/selectableItemBackground"
-                    android:textColor="@android:color/white" />
+                    android:text="@string/action_found_bike"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold" />
             </FrameLayout>
 
             <FrameLayout
                 android:id="@+id/delete_button_frame"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/button_accent"
                 android:layout_below="@+id/bikeLongitudeChange"
-                android:layout_marginTop="200dp">
+                android:layout_marginTop="200dp"
+                android:background="@drawable/button_accent">
+
                 <Button
                     android:id="@+id/delete_button"
                     style="?android:textAppearanceSmall"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:text="@string/action_delete_bike"
-                    android:textStyle="bold"
                     android:background="?android:attr/selectableItemBackground"
-                    android:textColor="@android:color/white" />
+                    android:text="@string/action_delete_bike"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold" />
             </FrameLayout>
         </RelativeLayout>
     </ScrollView>
-</RelativeLayout>
+
+    <ProgressBar
+        android:id="@+id/nfc_progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:paddingTop="50dp"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/bikeNfc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/action_txt"
+        android:textSize="17sp" />
+</LinearLayout>

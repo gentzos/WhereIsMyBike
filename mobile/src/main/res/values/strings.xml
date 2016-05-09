@@ -75,4 +75,9 @@
     <!-- Facebook -->
     <string name="facebook_app_id">108219459582853</string>
     <string name="title_activity_maps">Map</string>
+
+    <!--Bikes-->
+    <string name="action_txt">Waiting for NFC Bike Device</string>
+    <string name="action_cancel">Cancel</string>
+
 </resources>
