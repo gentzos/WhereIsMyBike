@@ -66,14 +66,19 @@ import java.util.Map;
  */
 public class UserLoginActivity extends AppCompatActivity {
 
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
-    private UserLoginTask mAuthTask = null;
+    // json object response url
+    private String urlJsonObjLogin = "http://192.168.0.102:3000/wimb/login";
+    private String urlJsonObjLoginBikes = "http://192.168.0.102:3000/wimb/loginBikes";
+    private String urlJsonObjFb = "http://192.168.0.102:3000/wimb/facebookLogin";
 
     public static final String LOGIN_USER = "login_key";
     public static final String FBLOGIN_USER = "fblogin_key";
     public static final String BIKE_KEY = "bike_key";
+
+    /**
+     * Keep track of the login task to ensure we can cancel it if requested.
+     */
+    private UserLoginTask mAuthTask = null;
 
     // UI references.
     private EditText mEmailView;
@@ -102,11 +107,6 @@ public class UserLoginActivity extends AppCompatActivity {
     private ProfileTracker mProfileTracker = null;
 
     private RequestQueue queue;
-
-    // json object response url
-    private String urlJsonObjLogin = "http://192.168.0.102:3000/wimb/login";
-    private String urlJsonObjLoginBikes = "http://192.168.0.102:3000/wimb/loginBikes";
-    private String urlJsonObjFb = "http://192.168.0.102:3000/wimb/facebookLogin";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

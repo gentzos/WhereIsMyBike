@@ -43,6 +43,7 @@ import java.util.Map;
  */
 public class UserRegisterActivity extends AppCompatActivity {
 
+    private String urlJsonObjRegister = "http://192.168.0.102:3000/wimb/register";
     public static final String REGISTER_USER = "register_key";
 
     /**
@@ -63,7 +64,6 @@ public class UserRegisterActivity extends AppCompatActivity {
     private View mRegisterFormView;
     private View focusView = null;
 
-    private String urlJsonObjRegister = "http://192.168.0.102:3000/wimb/register";
     private RequestQueue queue;
     private Bundle mBundle;
 
