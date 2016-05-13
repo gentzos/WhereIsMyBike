@@ -3,25 +3,47 @@ package com.aau.wimb.whereismybike.BikeOwner;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.aau.wimb.whereismybike.R;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A register screen that offers register via claims.
  */
 public class UserRegisterActivity extends AppCompatActivity {
+
+    public static final String REGISTER_USER = "register_key";
 
     /**
      * Keep track of the register task to ensure we can cancel it if requested.
@@ -39,12 +61,24 @@ public class UserRegisterActivity extends AppCompatActivity {
     private EditText mPhoneNumberView;
     private View mProgressView;
     private View mRegisterFormView;
+    private View focusView = null;
+
+    private String urlJsonObjRegister = "http://192.168.0.102:3000/wimb/register";
+    private RequestQueue queue;
+    private Bundle mBundle;
+
+    // To check if user had log in.
+    private SharedPreferences preferences;
+    private SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_register);
         setupActionBar();
+
+        // Instantiate the RequestQueue. It is for the database!
+        queue = Volley.newRequestQueue(this);
 
         mFirstNameView = (EditText) findViewById(R.id.first_name);
         mLastNameView = (EditText) findViewById(R.id.last_name);
@@ -114,7 +148,6 @@ public class UserRegisterActivity extends AppCompatActivity {
         String pNumber = mPhoneNumberView.getText().toString();
 
         boolean cancel = false;
-        View focusView = null;
 
         // Check for a mobile number.
         if (TextUtils.isEmpty(pNumber)) {
@@ -249,12 +282,12 @@ public class UserRegisterActivity extends AppCompatActivity {
      */
     public class UserRegisterTask extends AsyncTask<Void, Void, Boolean> {
 
-        private final String mFirstName;
-        private final String mLastName;
-        private final String mEmail;
-        private final String mPassword;
-        private final String mAddress;
-        private final String mPNumber;
+        private String mFirstName;
+        private String mLastName;
+        private String mEmail;
+        private String mPassword;
+        private String mAddress;
+        private String mPNumber;
 
         UserRegisterTask(String fName, String lName, String email, String password, String address, String pNumber) {
             mFirstName = fName;
@@ -267,24 +300,31 @@ public class UserRegisterActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
+            /**
+             * Gets current device state and checks for working internet
+             * connection by trying Google.
+             **/
+            ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo netInfo = cm.getActiveNetworkInfo();
+            if (netInfo != null && netInfo.isConnected()) {
+                try {
+                    URL url = new URL("http://www.google.com");
+                    HttpURLConnection urlc = (HttpURLConnection) url
+                            .openConnection();
+                    urlc.setConnectTimeout(3000);
+                    urlc.connect();
+                    if (urlc.getResponseCode() == 200) {
+                        return true;
+                    }
+                } catch (MalformedURLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
-
-//            for (String credential : DUMMY_CREDENTIALS) {
-//                String[] pieces = credential.split(":");
-//                if (pieces[0].equals(mEmail)) {
-//                    // Account exists, return true if the password matches.
-//                    return pieces[1].equals(mPassword);
-//                }
-//            }
-
-            return true;
+            return false;
         }
 
         @Override
@@ -292,15 +332,84 @@ public class UserRegisterActivity extends AppCompatActivity {
             mAuthTask = null;
             showProgress(false);
 
+//            if (success) {
+//                Intent myIntent = new Intent(UserRegisterActivity.this,UserMainActivity.class);
+//                setResult(3);
+//                myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                UserRegisterActivity.this.startActivity(myIntent);
+//                finish();
+//            } else {
+//                mPasswordView.setError(getString(R.string.error_incorrect_password));
+//                mPasswordView.requestFocus();
+//            }
+
             if (success) {
-                Intent myIntent = new Intent(UserRegisterActivity.this,UserMainActivity.class);
-                setResult(3);
-                myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                UserRegisterActivity.this.startActivity(myIntent);
-                finish();
+//                Intent myIntent = new Intent(UserLoginActivity.this, UserMainActivity.class);
+////                setResult(2);
+//                myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                UserLoginActivity.this.startActivity(myIntent);
+//                finish();
+//                mEmailView = (EditText) findViewById(R.id.email);
+                mEmail = mEmailView.getText().toString();
+                mPassword = mPasswordView.getText().toString();
+                mFirstName = mFirstNameView.getText().toString();
+                mLastName = mLastNameView.getText().toString();
+
+                StringRequest postRequest = new StringRequest(Request.Method.POST, urlJsonObjRegister,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                // response
+                                Log.e("Response", response);
+
+                                if (response.equals("error")) {
+                                    mEmailView.setError(getString(R.string.error_incorrect_email));
+                                    mPasswordView.setError(getString(R.string.error_incorrect_password));
+                                    focusView = mEmailView;
+                                    focusView = mPasswordView;
+
+                                } else {
+                                    mBundle = new Bundle();
+                                    mBundle.putString(REGISTER_USER, response);
+
+//                                  User signed in with facebook login.
+                                    preferences = PreferenceManager.getDefaultSharedPreferences(UserRegisterActivity.this);
+                                    editor = preferences.edit();
+                                    editor.putString("userLogin", "register");
+                                    editor.apply();
+
+                                    Intent myIntent = new Intent(UserRegisterActivity.this, UserMainActivity.class);
+                                    myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    myIntent.putExtras(mBundle);
+                                    UserRegisterActivity.this.startActivity(myIntent);
+                                    finish();
+                                }
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                // error
+                                Log.e("Error.Response", String.valueOf(error));
+                            }
+                        }
+                ) {
+                    @Override
+                    protected Map<String, String> getParams() {
+                        Map<String, String> params = new HashMap<String, String>();
+                        params.put("email", mEmail);
+                        params.put("pw", mPassword);
+                        params.put("fName", mFirstName);
+                        params.put("lName", mLastName);
+                        return params;
+                    }
+                };
+                queue.add(postRequest);
+
             } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
+                Toast.makeText(getApplicationContext(),
+                        "Error in Network Connection", Toast.LENGTH_SHORT)
+                        .show();
             }
         }
 

@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -47,6 +48,10 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.ProfilePictureView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,6 +59,12 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class UserMainActivity extends AppCompatActivity
@@ -74,6 +85,7 @@ public class UserMainActivity extends AppCompatActivity
 //    private CallbackManager callbackManager;
 
     private Profile mProfile = null;
+    private String loginString, registerString;
     private UserAccount user = new UserAccount();
     private ArrayList bikes = new ArrayList<Bike>();
 
@@ -99,19 +111,10 @@ public class UserMainActivity extends AppCompatActivity
             navigationView.setNavigationItemSelectedListener(this);
         }
 
-        mView =  navigationView.getHeaderView(0);
-        mName = (TextView)mView.findViewById(R.id.nameView);
+        mView = navigationView.getHeaderView(0);
+        mName = (TextView) mView.findViewById(R.id.nameView);
 //        mEmail = (TextView)mView.findViewById(R.id.emailView);
 //        mProfileImage = (ImageView)mView.findViewById(R.id.profileImageView);
-
-        Bike obj = new Bike("OD2F894NCUJEHDJM", "csd", "black", true, true, "none", 55.650299, 12.540938);
-        bikes.add(0, obj);
-        Bike obj1 = new Bike("OD2F894N", "cd0", "red", false, false, "someone", 65.650299, 22.540938);
-        bikes.add(1, obj1);
-        Bike obj2 = new Bike("OD2F894N", "cd2", "pink", true, true, "someone", 75.650299, 32.540938);
-        bikes.add(2, obj2);
-        Bike obj3 = new Bike("OD2F894N", "cd3", "blue", false, false, "none", 85.650299, 42.540938);
-        bikes.add(3, obj3);
 
         // Set the home as default
         fragment = new UserBikesFragment().newInstance(user, bikes);
@@ -121,24 +124,47 @@ public class UserMainActivity extends AppCompatActivity
                 .commit();
 
         if (mBundle != null) {
-            mProfile = (Profile) mBundle.getParcelable(UserLoginActivity.FBLOGIN_KEY);
-//            bikeString = mBundle.getString(UserLoginActivity.BIKE_KEY);
+            preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            String name = preferences.getString("userLogin", "");
 
-//            Log.e("NEWWWWW", bikeString + " ll");
+            if(name.equals("register"))
+            {
+                registerString = mBundle.getString(UserRegisterActivity.REGISTER_USER);
 
-            user.setUniqueId(mProfile.getId());
-            user.setProfileLink(mProfile.getLinkUri().toString());
-            user.setProfilePic(mProfile.getProfilePictureUri(50, 50).toString());
-            user.setFirstName(mProfile.getFirstName());
-            user.setLastName(mProfile.getLastName());
+                String[] userName = registerString.split(",");
+
+                user.setFirstName(userName[0]);
+                user.setLastName(userName[1]);
+
+            } else if(name.equals("normal")) {
+                loginString = mBundle.getString(UserLoginActivity.LOGIN_USER);
+                bikeString = mBundle.getString(UserLoginActivity.BIKE_KEY);
+
+                String[] userName = loginString.split(",");
+
+                user.setFirstName(userName[0]);
+                user.setLastName(userName[1]);
+
+                retrieveBikes();
+
+            } else if(name.equals("facebook")) {
+                mProfile = (Profile) mBundle.getParcelable(UserLoginActivity.FBLOGIN_USER);
+                bikeString = mBundle.getString(UserLoginActivity.BIKE_KEY);
+
+                user.setUniqueId(mProfile.getId());
+                user.setProfileLink(mProfile.getLinkUri().toString());
+                user.setProfilePic(mProfile.getProfilePictureUri(50, 50).toString());
+                user.setFirstName(mProfile.getFirstName());
+                user.setLastName(mProfile.getLastName());
+
+                ProfilePictureView profilePictureView;
+                profilePictureView = (ProfilePictureView) mView.findViewById(R.id.fbProfileImage);
+                profilePictureView.setProfileId(mProfile.getId());
+
+                retrieveBikes();
+            }
 
             mName.setText(user.getFirstName() + " " + user.getLastName());
-
-            ProfilePictureView profilePictureView;
-            profilePictureView = (ProfilePictureView)mView.findViewById(R.id.fbProfileImage);
-            profilePictureView.setProfileId(mProfile.getId());
-
-
         }
     }
 
@@ -237,5 +263,43 @@ public class UserMainActivity extends AppCompatActivity
     @Override
     public void onFragmentInteraction(Uri uri) {
 
+    }
+
+    private void retrieveBikes(){
+        // If bikes exists show them in the list.
+        if (bikeString != "false") {
+            Map<String, String> mapBikes = new HashMap<>();
+            Map<String, String> map = new HashMap<>();
+            String[] entry = new String[2];
+            int i = 0;
+            int j = 0;
+
+            Pattern pattern = Pattern.compile("\\{(.*?)\\}");
+            Matcher matcher = pattern.matcher(bikeString);
+            while (matcher.find()) {
+                String[] items = matcher.group(1).split(",");
+
+                //iterate over the pairs
+                for (String pair : items)
+                {
+                    Pattern pattern2 = Pattern.compile("\"(.*?)\"");
+                    Matcher matcher2 = pattern2.matcher(pair);
+                    while (matcher2.find()) {
+                        entry[i] = matcher2.group(1);
+                        i++;
+                    }
+
+                    //add them to the hashmap
+                    map.put(entry[0], entry[1]);
+                    i = 0;
+                }
+
+                Bike obj = new Bike(map.get("VIN"), map.get("brand"), map.get("color"),
+                        Boolean.valueOf(map.get("lock")), Boolean.valueOf(map.get("status")),
+                        map.get("access"), Double.parseDouble(map.get("latitude")), Double.parseDouble(map.get("longitude")));
+                bikes.add(j, obj);
+                j++;
+            }
+        }
     }
 }

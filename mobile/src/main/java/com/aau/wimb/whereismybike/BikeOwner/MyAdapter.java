@@ -129,7 +129,7 @@ public class MyAdapter extends RecyclerView
             holder.access.setText("None");
             holder.access.setTextColor(holder.itemView.getResources().getColor(R.color.colorPrimary));
         } else {
-            holder.access.setText("Someone");
+            holder.access.setText(mDataset.get(position).getAccess());
             holder.access.setTextColor(holder.itemView.getResources().getColor(R.color.colorAccent));
         }
 
