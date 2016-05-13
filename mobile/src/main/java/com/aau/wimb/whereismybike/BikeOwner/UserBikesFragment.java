@@ -192,13 +192,4 @@ public class UserBikesFragment extends Fragment {
 //        super.onSaveInstanceState(outState);
 //        outState.putParcelableArrayList("BIKES", bikes);
 //    }
-
-    private ArrayList<Bike> getDataSet() {
-        ArrayList results = new ArrayList<Bike>();
-        for (int index = 0; index < 1; index++) {
-            Bike obj = new Bike("OD2F894NCUJEHDJM", "csd", "csd", true, true, "None", 55.650299, 12.540938);
-            results.add(index, obj);
-        }
-        return results;
-    }
 }
