@@ -160,28 +160,35 @@ public class UserLoginActivity extends AppCompatActivity {
         mSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                // For testing purposes. Must be commented.
+//                preferences = PreferenceManager.getDefaultSharedPreferences(UserLoginActivity.this);
+//                editor = preferences.edit();
+//                editor.putString("userLogin", "normal");
+//                editor.apply();
+//
+//                Intent myIntent = new Intent(UserLoginActivity.this, UserMainActivity.class);
+//                UserLoginActivity.this.startActivity(myIntent);
+//                finish();
+
+                // Actual action
                 attemptLogin();
             }
         });
 
-//        mAccessTokenTracker = new AccessTokenTracker() {
-//            @Override
-//            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
-//                Log.e("WiMB", "Access Token " + currentAccessToken);
-//            }
-//        };
-//
-//        mProfileTracker = new ProfileTracker() {
-//            @Override
-//            protected void onCurrentProfileChanged(Profile oldProfile, Profile currentProfile) {
-//                Log.e("WiMB", "Profile " + currentProfile);
-//            }
-//        };
-//
-//        mAccessTokenTracker.startTracking();
-//        mProfileTracker.startTracking();
+        // Check if user had log in.
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        userLogin = preferences.getString("userLogin", "");
+        Log.e("Login", userLogin);
+        if(!userLogin.equals("false"))
+        {
+            Intent myIntent = new Intent(UserLoginActivity.this, UserMainActivity.class);
+            myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            UserLoginActivity.this.startActivity(myIntent);
+            finish();
+        }
 
-        AccessToken();
+//        AccessToken();
 
         mFacebookButton.setReadPermissions("email");
         mFacebookButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
@@ -206,23 +213,6 @@ public class UserLoginActivity extends AppCompatActivity {
                 }
             }
 
-
-//            @Override
-//            public void onSuccess(LoginResult loginResult) {
-//                mAccessToken = loginResult.getAccessToken();
-//                mProfile = Profile.getCurrentProfile();
-//                Log.e("WiMB", "THIS ACCESS " + mAccessToken);
-//                Log.e("WiMB", "THIS PROFILE " + mProfile);
-//
-//                // User signed in. Use in LaunchActivity to jump to LoginActivity.
-//                preferences = PreferenceManager.getDefaultSharedPreferences(UserLoginActivity.this);
-//                editor = preferences.edit();
-//                editor.putString("userLogin","true");
-//                editor.apply();
-//
-//                AccessToken();
-//            }
-
             @Override
             public void onCancel() {
                 Log.v("facebook - onCancel", "cancelled");
@@ -238,10 +228,6 @@ public class UserLoginActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         mCallbackManager.onActivityResult(requestCode, resultCode, data);
-//        if (resultCode == 3) {
-//            setResult(2);
-//            finish();
-//        }
     }
 
     @Override
@@ -252,8 +238,6 @@ public class UserLoginActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
-//        mAccessTokenTracker.stopTracking();
-//        mProfileTracker.stopTracking();
     }
 
     /**
@@ -417,12 +401,6 @@ public class UserLoginActivity extends AppCompatActivity {
             showProgress(false);
 
             if (success) {
-//                Intent myIntent = new Intent(UserLoginActivity.this, UserMainActivity.class);
-////                setResult(2);
-//                myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//                UserLoginActivity.this.startActivity(myIntent);
-//                finish();
-//                mEmailView = (EditText) findViewById(R.id.email);
                 mEmail = mEmailView.getText().toString();
                 mPassword = mPasswordView.getText().toString();
 
@@ -442,7 +420,7 @@ public class UserLoginActivity extends AppCompatActivity {
                                 } else {
                                     mBundle.putString(LOGIN_USER, response);
 
-//                                    User signed in with normal login.
+                                    // User signed in with normal login.
                                     preferences = PreferenceManager.getDefaultSharedPreferences(UserLoginActivity.this);
                                     editor = preferences.edit();
                                     editor.putString("userLogin", "normal");
@@ -481,7 +459,6 @@ public class UserLoginActivity extends AppCompatActivity {
                                         protected Map<String, String> getParams() {
                                             Map<String, String> params = new HashMap<String, String>();
                                             params.put("email", mEmail);
-//                                            params.put("password", mPassword);
 
                                             return params;
                                         }

@@ -36,7 +36,8 @@
 
     <!-- Fragments -->
     <string name="title_fragment_bike_user_account">Manage Account</string>
-    <string name="prompt_bike_vin">Vin Number:</string>
+    <string name="prompt_no_bikes">No bikes.</string>
+    <string name="prompt_bike_vin">VIN No:</string>
     <string name="prompt_bike_brand">Brand:</string>
     <string name="prompt_bike_color">Color:</string>
     <string name="prompt_bike_lock">Lock:</string>
@@ -45,10 +46,10 @@
     <string name="prompt_bike_latitude">Latitude:</string>
     <string name="prompt_bike_longitude">Longitude:</string>
 
-    <string name="prompt_bike_vin_change">Bike Vin</string>
+    <string name="prompt_bike_vin_change">Bike VIN Number</string>
     <string name="prompt_bike_brand_change">Bike Brand</string>
-    <string name="prompt_bike_color_change">Bike Color:</string>
-    <string name="prompt_bike_lock_change">Bike Lock:</string>
+    <string name="prompt_bike_color_change">Bike Color</string>
+    <string name="prompt_bike_lock_change">Bike Lock</string>
     <string name="prompt_bike_status_change">Bike Status</string>
     <string name="prompt_bike_access_change">Bike Access</string>
     <string name="prompt_bike_latitude_change">Bike Latitude</string>
@@ -77,7 +78,11 @@
     <string name="title_activity_maps">Map</string>
 
     <!--Bikes-->
-    <string name="action_txt">Waiting for NFC Bike Device</string>
+    <string name="action_nfc_txt">Waiting for NFC Bike Device</string>
+    <string name="action_bike_details_txt">Please fill in the details of your bike to proceed with the registration.</string>
     <string name="action_cancel">Cancel</string>
+
+    <!--NFC-->
+    <string name="nfc_address">com.example.daniel.bikedevice</string>
 
 </resources>

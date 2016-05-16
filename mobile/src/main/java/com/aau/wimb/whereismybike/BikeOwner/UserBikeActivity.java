@@ -4,24 +4,48 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Dialog;
+import android.content.Intent;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
+import android.nfc.NfcEvent;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Parcelable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.aau.wimb.whereismybike.R;
 
-public class UserBikeActivity extends AppCompatActivity {
+import java.nio.charset.Charset;
+import java.security.Key;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.spec.X509EncodedKeySpec;
+
+import javax.crypto.Cipher;
+
+public class UserBikeActivity extends AppCompatActivity implements NfcAdapter.CreateNdefMessageCallback {
 
     public static final String NEW_BIKE = "newBike";
     private String newBike;
 
-    private UserLoginTask mAuthTask = null;
+    private BikeRegisterTask mAuthTask = null;
+
+    // NFC/security variables.
+    private NfcAdapter mNfcAdapter;
+    private Key publicKey, privateKey;
+    private static int nfcCounter = 0;
 
     // UI references.
     private TextView mBikeVin;
@@ -56,6 +80,7 @@ public class UserBikeActivity extends AppCompatActivity {
     private View mNormalView;
     private View mProgressView;
 
+    private Bundle mBundle = new Bundle();
     private String[] sepString = new String[7];
 
     @Override
@@ -63,7 +88,27 @@ public class UserBikeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_bike);
 
-        Bundle mBundle = getIntent().getExtras();
+        // Check for available NFC Adapter
+        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        if (mNfcAdapter == null) {Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
+
+        // Register callback
+        mNfcAdapter.setNdefPushMessageCallback(this, this);
+        publicKey = null;
+        privateKey = null;
+        try {
+            KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+            kpg.initialize(1024);
+            KeyPair kp = kpg.genKeyPair();
+            publicKey = kp.getPublic();
+            privateKey = kp.getPrivate();
+        } catch (Exception e) {
+        }
+
+        mBundle = getIntent().getExtras();
 
         // Set up the UI.
         mBikeVin = (TextView) findViewById(R.id.bikeVinChange);
@@ -100,9 +145,19 @@ public class UserBikeActivity extends AppCompatActivity {
         if(mBundle != null){
             newBike = mBundle.getString(NEW_BIKE);
             if(newBike.equals("true")){
-                showProgress(true);
-                mAuthTask = new UserLoginTask();
+//                showProgress(true);
+                mAuthTask = new BikeRegisterTask();
                 mAuthTask.execute((Void) null);
+
+                mBikeVin.setVisibility(View.INVISIBLE);
+                mBikeBrand.setVisibility(View.INVISIBLE);
+                mBikeColor.setVisibility(View.INVISIBLE);
+
+                mBikeLock.setVisibility(View.INVISIBLE);
+                mBikeStatus.setVisibility(View.INVISIBLE);
+                mBikeAccess.setVisibility(View.INVISIBLE);
+                mBikeLatitude.setVisibility(View.INVISIBLE);
+                mBikeLongitude.setVisibility(View.INVISIBLE);
 
                 mDeleteBikeLayout.setVisibility(View.INVISIBLE);
                 mLockBikeLayout.setVisibility(View.INVISIBLE);
@@ -111,8 +166,6 @@ public class UserBikeActivity extends AppCompatActivity {
                 mDenyBikeLayout.setVisibility(View.INVISIBLE);
                 mStolenBikeLayout.setVisibility(View.INVISIBLE);
                 mFoundBikeLayout.setVisibility(View.INVISIBLE);
-
-
 
             } else {
                 showProgress(false);
@@ -159,6 +212,81 @@ public class UserBikeActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public NdefMessage createNdefMessage(NfcEvent event) {
+        String text = ("RSA Works! \n\n" + "Beam Time: " + System.currentTimeMillis());
+        String sendingText = "";
+        byte[] encodedBytes = null;
+        try {
+            Cipher c = Cipher.getInstance("RSA");
+            c.init(Cipher.ENCRYPT_MODE, privateKey);
+            encodedBytes = c.doFinal(text.getBytes());
+            sendingText = "Key: " + "\n"+ Base64.encodeToString(publicKey.getEncoded(),Base64.NO_WRAP) +"\n"+ "Encrypted Text: " +"\n"+ Base64.encodeToString(encodedBytes, Base64.NO_WRAP);
+        } catch (Exception e) {
+        }
+        NdefMessage msg = new NdefMessage(new NdefRecord[] { createMimeRecord("application/@string/nfc_address", sendingText.getBytes())});
+        return msg;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Check to see that the Activity started due to an Android Beam
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
+            processIntent(getIntent());
+        }
+    }
+
+    @Override
+    public void onNewIntent(Intent intent) {
+        // onResume gets called after this to handle the intent
+        setIntent(intent);
+    }
+
+    /**
+     * Parses the NDEF Message from the intent and prints to the TextView
+     */
+    void processIntent(Intent intent) {
+
+        byte[] decodedBytes = null;
+        Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+
+        // only one message sent during the beam
+        NdefMessage msg = (NdefMessage) rawMsgs[0];
+        Log.e("NFCCCC", "YYYYY");
+        // record 0 contains the MIME type, record 1 is the AAR, if present
+//        String recString = new String(msg.getRecords()[0].getPayload());
+//        String[] stringSplit = recString.split("\n");
+//        String pubKey = stringSplit[1];
+//        String cipherText = stringSplit[3];
+//
+//        byte[] pubByte = Base64.decode(pubKey,Base64.NO_WRAP);
+//        byte[] cipTextByte = Base64.decode(cipherText,Base64.NO_WRAP);
+//        try{
+//            KeyFactory kf = KeyFactory.getInstance("RSA");
+//            Key pubKeyObe = kf.generatePublic(new X509EncodedKeySpec(pubByte));
+//            Cipher c = Cipher.getInstance("RSA");
+//            c.init(Cipher.DECRYPT_MODE, pubKeyObe);
+//            decodedBytes = c.doFinal(cipTextByte);
+//        }catch(Exception e){
+//
+//        }
+//
+//
+//        mBikeVin.setText("Key: " +pubKey+"\n\n"+"Cipher Text: "+ cipherText+"\n\n"+new String(decodedBytes));
+    }
+
+    /**
+     * Creates a custom MIME type encapsulated in an NDEF record
+     *
+     * @param mimeType
+     */
+    public NdefRecord createMimeRecord(String mimeType, byte[] payload) {
+        byte[] mimeBytes = mimeType.getBytes(Charset.forName("US-ASCII"));
+        NdefRecord mimeRecord = new NdefRecord(NdefRecord.TNF_MIME_MEDIA, mimeBytes, new byte[0], payload);
+        return mimeRecord;
+    }
+
     /**
      * Shows the progress UI and hides the normal form.
      */
@@ -199,9 +327,9 @@ public class UserBikeActivity extends AppCompatActivity {
      * Represents an asynchronous login task used to authenticate
      * the user.
      */
-    private class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    private class BikeRegisterTask extends AsyncTask<Void, Void, Boolean> {
 
-        UserLoginTask() {
+        BikeRegisterTask() {
         }
 
         @Override
@@ -236,7 +364,7 @@ public class UserBikeActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
-//            showProgress(false);
+            showProgress(false);
 
             if (success) {
 //                Intent myIntent = new Intent(UserLoginActivity.this, UserMainActivity.class);

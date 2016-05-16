@@ -9,10 +9,12 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.aau.wimb.whereismybike.Bike;
 import com.aau.wimb.whereismybike.OnFragmentInteractionListener;
@@ -58,6 +60,8 @@ public class UserBikesFragment extends Fragment {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private static String LOG_TAG = "CardViewActivity";
+
+    private TextView mNoBikes;
 
     /**
      * Use this factory method to create a new instance of
@@ -116,6 +120,19 @@ public class UserBikesFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.my_recycler_view);
+        mNoBikes = (TextView) view.findViewById(R.id.noBikes);
+        mNoBikes.setText("You have no bikes registered to your account yet. \n Press the plus \"+\" button to add one.");
+
+        if (bikes.size() == 0) {
+            Log.e("BIKES", bikes + " NULL");
+            mRecyclerView.setVisibility(View.INVISIBLE);
+
+        } else {
+            Log.e("BIKES", bikes + " NOT NULL");
+            mNoBikes.setVisibility(View.INVISIBLE);
+
+
+        }
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -133,8 +150,8 @@ public class UserBikesFragment extends Fragment {
         newBike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent myIntent = new Intent(getActivity(),UserBikeActivity.class);
-                myIntent.putExtra(NEW_BIKE, "true");
+                Intent myIntent = new Intent(getActivity(), UserNewBikeActivity.class);
+//                myIntent.putExtra(NEW_BIKE, "true");
                 startActivity(myIntent);
 
 //                Bike obj = new Bike("Black Panther ", "OD2F894NCUJEHDJM", "Locked", "None");

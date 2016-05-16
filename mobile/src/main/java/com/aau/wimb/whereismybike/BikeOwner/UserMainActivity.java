@@ -73,7 +73,7 @@ public class UserMainActivity extends AppCompatActivity
     private Fragment fragment;
     private FragmentManager fragmentManager;
     private int id;
-    private String bikeString;
+    private String bikeString, userLogin;
 
     private TextView mName;
     private TextView mEmail;
@@ -123,11 +123,15 @@ public class UserMainActivity extends AppCompatActivity
                 .replace(R.id.content, fragment)
                 .commit();
 
+        // For testing purposes. Must be commented.
+//        Bike obj = new Bike("wb0256", "Velorbis", "Green", false, false, "none", 55.6527395, 12.5432467);
+//        bikes.add(0, obj);
+
         if (mBundle != null) {
             preferences = PreferenceManager.getDefaultSharedPreferences(this);
-            String name = preferences.getString("userLogin", "");
+            userLogin = preferences.getString("userLogin", "");
 
-            if(name.equals("register"))
+            if(userLogin.equals("register"))
             {
                 registerString = mBundle.getString(UserRegisterActivity.REGISTER_USER);
 
@@ -136,7 +140,7 @@ public class UserMainActivity extends AppCompatActivity
                 user.setFirstName(userName[0]);
                 user.setLastName(userName[1]);
 
-            } else if(name.equals("normal")) {
+            } else if(userLogin.equals("normal")) {
                 loginString = mBundle.getString(UserLoginActivity.LOGIN_USER);
                 bikeString = mBundle.getString(UserLoginActivity.BIKE_KEY);
 
@@ -147,7 +151,7 @@ public class UserMainActivity extends AppCompatActivity
 
                 retrieveBikes();
 
-            } else if(name.equals("facebook")) {
+            } else if(userLogin.equals("facebook")) {
                 mProfile = (Profile) mBundle.getParcelable(UserLoginActivity.FBLOGIN_USER);
                 bikeString = mBundle.getString(UserLoginActivity.BIKE_KEY);
 

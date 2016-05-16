@@ -41,7 +41,7 @@ public class LaunchActivity extends AppCompatActivity {
     private CallbackManager mCallbackManager;
 
 //    To check if user had log in.
-    private String userLogin = "false";
+    private String userLogin;
     private SharedPreferences preferences;
 
     @Override
@@ -63,9 +63,10 @@ public class LaunchActivity extends AppCompatActivity {
 //        To check if user had log in.
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         userLogin = preferences.getString("userLogin", "");
-        if(userLogin.equalsIgnoreCase("true"))
+        Log.e("Login", userLogin);
+        if(!userLogin.equals("false"))
         {
-            Intent myIntent = new Intent(LaunchActivity.this, UserLoginActivity.class);
+            Intent myIntent = new Intent(LaunchActivity.this, UserMainActivity.class);
             myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             LaunchActivity.this.startActivity(myIntent);
             finish();

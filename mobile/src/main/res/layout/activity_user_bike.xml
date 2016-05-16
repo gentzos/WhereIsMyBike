@@ -13,7 +13,7 @@
         android:layout_height="match_parent">
 
         <RelativeLayout
-            android:id="@+id/register_bike"
+            android:id="@+id/edit_bike"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -78,7 +78,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/bikeColor"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="25dp"
                 android:hint="@string/prompt_bike_lock"
                 android:textStyle="bold" />
 
@@ -88,7 +88,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/bikeColorChange"
                 android:layout_marginLeft="85dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="25dp"
                 android:hint="@string/prompt_bike_lock_change" />
 
             <TextView
@@ -132,7 +132,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/bikeStatus"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="25dp"
                 android:hint="@string/prompt_bike_latitude"
                 android:textStyle="bold" />
 
@@ -142,7 +142,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/bikeStatusChange"
                 android:layout_marginLeft="85dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="25dp"
                 android:hint="@string/prompt_bike_latitude_change" />
 
             <TextView
@@ -333,6 +333,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="@string/action_txt"
+        android:text="@string/action_nfc_txt"
         android:textSize="17sp" />
 </LinearLayout>
