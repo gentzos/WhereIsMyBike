@@ -23,12 +23,21 @@ tools:context="com.aau.wimb.whereismybike.BikeOwner.UserBikesFragment">
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin" />
 
-<android.support.design.widget.FloatingActionButton
-    android:id="@+id/new_bike"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_alignParentBottom="true"
-    android:layout_alignParentRight="true"
-    android:layout_margin="@dimen/fab_margin"
-    android:src="@drawable/ic_menu_add" />
+    <TextView
+        android:id="@+id/noBikes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:hint="@string/prompt_no_bikes"
+        android:textStyle="bold"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/new_bike"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@drawable/ic_menu_add" />
 </RelativeLayout>

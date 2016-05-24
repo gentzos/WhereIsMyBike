@@ -34,15 +34,8 @@ import java.security.NoSuchAlgorithmException;
 
 public class LaunchActivity extends AppCompatActivity {
 
-    // To track the tokens
-    private AccessTokenTracker mAccessTokenTracker = null;
-
     // Facebook
     private CallbackManager mCallbackManager;
-
-//    To check if user had log in.
-    private String userLogin = "false";
-    private SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,23 +47,25 @@ public class LaunchActivity extends AppCompatActivity {
 //        printKeyHash();
 
         Button mBikeOwnerButton = (Button) findViewById(R.id.bike_owner_btn);
-        Button mPoliceButton = (Button) findViewById(R.id.police_btn);
+//        Button mPoliceButton = (Button) findViewById(R.id.police_btn);
 
 //        Facebook Initialize.
         FacebookSdk.sdkInitialize(getApplicationContext());
         mCallbackManager = CallbackManager.Factory.create();
 
 //        To check if user had log in.
-        preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        userLogin = preferences.getString("userLogin", "");
-        if(userLogin.equalsIgnoreCase("true"))
-        {
-            Intent myIntent = new Intent(LaunchActivity.this, UserLoginActivity.class);
-            myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            LaunchActivity.this.startActivity(myIntent);
-            finish();
-        }
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String userLogin = preferences.getString("userLogin", "");
+        Log.e("Login", userLogin);
+//        if(!userLogin.equals("false"))
+//        {
+//            Intent myIntent = new Intent(LaunchActivity.this, UserMainActivity.class);
+//            myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//            LaunchActivity.this.startActivity(myIntent);
+//            finish();
+//        }
 
+        assert mBikeOwnerButton != null;
         mBikeOwnerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -81,15 +76,16 @@ public class LaunchActivity extends AppCompatActivity {
                 }
         });
 
-        mPoliceButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                Intent myIntent = new Intent(LaunchActivity.this, PoliceLoginActivity.class);
-//                    myIntent.putExtra("accountInfo", "police");
-                    LaunchActivity.this.startActivity(myIntent);
-//                    startActivityForResult(myIntent,2);
-                }
-            });
+//        assert mPoliceButton != null;
+//        mPoliceButton.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                Intent myIntent = new Intent(LaunchActivity.this, PoliceLoginActivity.class);
+////                    myIntent.putExtra("accountInfo", "police");
+//                    LaunchActivity.this.startActivity(myIntent);
+////                    startActivityForResult(myIntent,2);
+//                }
+//            });
     }
 
     /**
