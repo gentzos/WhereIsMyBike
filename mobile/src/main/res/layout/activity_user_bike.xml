@@ -164,25 +164,6 @@
                 android:hint="@string/prompt_bike_longitude_change" />
 
             <FrameLayout
-                android:id="@+id/save_button_frame"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/bikeLongitudeChange"
-                android:layout_marginTop="20dp"
-                android:background="@drawable/button_primary">
-
-                <Button
-                    android:id="@+id/save_button"
-                    style="?android:textAppearanceSmall"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:text="@string/action_save_bike"
-                    android:textColor="@android:color/white"
-                    android:textStyle="bold" />
-            </FrameLayout>
-
-            <FrameLayout
                 android:id="@+id/lock_button_frame"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -266,7 +247,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/bikeLongitudeChange"
                 android:layout_marginTop="150dp"
-                android:background="@drawable/button_primary_dark">
+                android:background="@drawable/button_accent">
 
                 <Button
                     android:id="@+id/stolen_button"
@@ -285,7 +266,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/bikeLongitudeChange"
                 android:layout_marginTop="150dp"
-                android:background="@drawable/button_accent">
+                android:background="@drawable/button_primary_dark">
 
                 <Button
                     android:id="@+id/found_button"
@@ -318,21 +299,4 @@
             </FrameLayout>
         </RelativeLayout>
     </ScrollView>
-
-    <ProgressBar
-        android:id="@+id/nfc_progress"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:paddingTop="50dp"
-        android:visibility="gone"/>
-
-    <TextView
-        android:id="@+id/bikeNfc"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/action_nfc_txt"
-        android:textSize="17sp" />
 </LinearLayout>

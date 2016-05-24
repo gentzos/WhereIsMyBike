@@ -1,51 +1,41 @@
 package com.aau.wimb.whereismybike.BikeOwner;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
-import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcEvent;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Parcelable;
-import android.support.v4.content.ContextCompat;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aau.wimb.whereismybike.R;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 
 import java.nio.charset.Charset;
-import java.security.Key;
-import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.spec.X509EncodedKeySpec;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 
 public class UserBikeActivity extends AppCompatActivity implements NfcAdapter.CreateNdefMessageCallback {
 
-    public static final String NEW_BIKE = "newBike";
-    private String newBike;
-
-    private BikeRegisterTask mAuthTask = null;
-
-    // NFC/security variables.
-    private NfcAdapter mNfcAdapter;
-    private Key publicKey, privateKey;
-    private static int nfcCounter = 0;
+    private String urlJsonObjReportStolen = "http://192.168.0.104:3000/wimb/reportStolen";
+    private String urlJsonObjReportFound = "http://192.168.0.104:3000/wimb/reportFound";
 
     // UI references.
     private TextView mBikeVin;
@@ -56,9 +46,7 @@ public class UserBikeActivity extends AppCompatActivity implements NfcAdapter.Cr
     private TextView mBikeAccess;
     private TextView mBikeLatitude;
     private TextView mBikeLongitude;
-    private TextView mBikeNfc;
 
-    private FrameLayout mSaveBikeLayout;
     private FrameLayout mDeleteBikeLayout;
     private FrameLayout mLockBikeLayout;
     private FrameLayout mUnlockBikeLayout;
@@ -77,36 +65,25 @@ public class UserBikeActivity extends AppCompatActivity implements NfcAdapter.Cr
     private Button mStolenBikeButton;
     private Button mFoundBikeButton;
 
-    private View mNormalView;
-    private View mProgressView;
-
+    private String editBike;
     private Bundle mBundle = new Bundle();
     private String[] sepString = new String[7];
+
+    private String locked, status;
+    private String symKeyString = "null";
+    SecretKeySpec symKey;
+
+    // NFC variables.
+    private NfcAdapter mNfcAdapter;
+
+    private RequestQueue queue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_bike);
 
-        // Check for available NFC Adapter
-        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        if (mNfcAdapter == null) {Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG).show();
-            finish();
-            return;
-        }
-
-        // Register callback
-        mNfcAdapter.setNdefPushMessageCallback(this, this);
-        publicKey = null;
-        privateKey = null;
-        try {
-            KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-            kpg.initialize(1024);
-            KeyPair kp = kpg.genKeyPair();
-            publicKey = kp.getPublic();
-            privateKey = kp.getPrivate();
-        } catch (Exception e) {
-        }
+        queue = Volley.newRequestQueue(this);
 
         mBundle = getIntent().getExtras();
 
@@ -119,9 +96,7 @@ public class UserBikeActivity extends AppCompatActivity implements NfcAdapter.Cr
         mBikeAccess = (TextView) findViewById(R.id.bikeAccessChange);
         mBikeLatitude = (TextView) findViewById(R.id.bikeLatitudeChange);
         mBikeLongitude = (TextView) findViewById(R.id.bikeLongitudeChange);
-        mBikeNfc = (TextView) findViewById(R.id.bikeNfc);
 
-        mSaveBikeLayout = (FrameLayout) findViewById(R.id.save_button_frame);
         mDeleteBikeLayout = (FrameLayout) findViewById(R.id.delete_button_frame);
         mLockBikeLayout = (FrameLayout) findViewById(R.id.lock_button_frame);
         mUnlockBikeLayout = (FrameLayout) findViewById(R.id.unlock_button_frame);
@@ -139,300 +114,191 @@ public class UserBikeActivity extends AppCompatActivity implements NfcAdapter.Cr
         mStolenBikeButton = (Button) findViewById(R.id.stolen_button);
         mFoundBikeButton = (Button) findViewById(R.id.found_button);
 
-        mNormalView = findViewById(R.id.normal_bike_scroll);
-        mProgressView = findViewById(R.id.nfc_progress);
+        // A bike was selected to show.
+        if (mBundle != null) {
+            editBike = mBundle.getString(MyAdapter.EDIT_BIKE);
 
-        if(mBundle != null){
-            newBike = mBundle.getString(NEW_BIKE);
-            if(newBike.equals("true")){
-//                showProgress(true);
-                mAuthTask = new BikeRegisterTask();
-                mAuthTask.execute((Void) null);
+            sepString = editBike.split("\\-");
+            mBikeVin.setText(sepString[0]);
+            mBikeBrand.setText(sepString[1]);
+            mBikeColor.setText(sepString[2]);
+            symKeyString = sepString[3];
+            Toast.makeText(UserBikeActivity.this, sepString[3], Toast.LENGTH_SHORT).show();
+            mBikeLock.setText(sepString[4]);
+            mBikeStatus.setText(sepString[5]);
+            mBikeAccess.setText(sepString[6]);
+            mBikeLatitude.setText(sepString[7]);
+            mBikeLongitude.setText(sepString[8]);
 
-                mBikeVin.setVisibility(View.INVISIBLE);
-                mBikeBrand.setVisibility(View.INVISIBLE);
-                mBikeColor.setVisibility(View.INVISIBLE);
-
-                mBikeLock.setVisibility(View.INVISIBLE);
-                mBikeStatus.setVisibility(View.INVISIBLE);
-                mBikeAccess.setVisibility(View.INVISIBLE);
-                mBikeLatitude.setVisibility(View.INVISIBLE);
-                mBikeLongitude.setVisibility(View.INVISIBLE);
-
-                mDeleteBikeLayout.setVisibility(View.INVISIBLE);
+            if ((mBikeLock.getText().equals("Locked")) || (mBikeLock.getText().equals("true"))) {
+                locked = "true";
                 mLockBikeLayout.setVisibility(View.INVISIBLE);
-                mUnlockBikeLayout.setVisibility(View.INVISIBLE);
-                mAllowBikeLayout.setVisibility(View.INVISIBLE);
-                mDenyBikeLayout.setVisibility(View.INVISIBLE);
-                mStolenBikeLayout.setVisibility(View.INVISIBLE);
-                mFoundBikeLayout.setVisibility(View.INVISIBLE);
-
+                mBikeLock.setTextColor(getResources().getColor(R.color.colorPrimary));
+                mBikeLock.setText("Locked");
             } else {
-                showProgress(false);
+                locked = "false";
+                mUnlockBikeLayout.setVisibility(View.INVISIBLE);
+                mBikeLock.setTextColor(getResources().getColor(R.color.colorAccent));
+                mBikeLock.setText("Unlocked");
+            }
 
-                getSupportActionBar().setTitle(R.string.title_activity_edit_bike);
-                mSaveBikeLayout.setVisibility(View.INVISIBLE);
-                mBikeNfc.setVisibility(View.INVISIBLE);
-                sepString = newBike.split("\\-");
+            if ((mBikeStatus.getText().equals("Stolen")) || (mBikeStatus.getText().equals("true"))) {
+                status = "true";
+                mStolenBikeLayout.setVisibility(View.INVISIBLE);
+                mBikeStatus.setTextColor(getResources().getColor(R.color.colorAccent));
+                mBikeStatus.setText("Stolen");
+            } else {
+                status = "false";
+                mFoundBikeLayout.setVisibility(View.INVISIBLE);
+                mBikeStatus.setTextColor(getResources().getColor(R.color.colorPrimary));
+                mBikeStatus.setText("Safe");
+            }
 
-                mBikeVin.setText(sepString[0]);
-                mBikeBrand.setText(sepString[1]);
-                mBikeColor.setText(sepString[2]);
-                mBikeLock.setText(sepString[3]);
-                mBikeStatus.setText(sepString[4]);
-                mBikeAccess.setText(sepString[5]);
-                mBikeLatitude.setText(sepString[6]);
-                mBikeLongitude.setText(sepString[7]);
-
-                if(mBikeLock.getText().equals("Locked")){
-                    mLockBikeLayout.setVisibility(View.INVISIBLE);
-                    mBikeLock.setTextColor(getResources().getColor(R.color.colorPrimary));
-                } else {
-                    mUnlockBikeLayout.setVisibility(View.INVISIBLE);
-                    mBikeLock.setTextColor(getResources().getColor(R.color.colorAccent));
-                }
-
-                if(mBikeStatus.getText().equals("Stolen")){
-                    mStolenBikeLayout.setVisibility(View.INVISIBLE);
-                    mBikeStatus.setTextColor(getResources().getColor(R.color.colorAccent));
-                } else {
-                    mFoundBikeLayout.setVisibility(View.INVISIBLE);
-                    mBikeStatus.setTextColor(getResources().getColor(R.color.colorPrimary));
-                }
-
-                if(mBikeAccess.getText().equals("None")){
-                    mDenyBikeLayout.setVisibility(View.INVISIBLE);
-                    mBikeAccess.setTextColor(getResources().getColor(R.color.colorPrimary));
-                } else {
-                    mAllowBikeLayout.setVisibility(View.INVISIBLE);
-                    mBikeAccess.setTextColor(getResources().getColor(R.color.colorAccent));
-                }
+            if ((mBikeAccess.getText().equals("None")) || (mBikeAccess.getText().equals("none"))) {
+                mDenyBikeLayout.setVisibility(View.INVISIBLE);
+                mBikeAccess.setTextColor(getResources().getColor(R.color.colorPrimary));
+                mBikeAccess.setText("None");
+            } else {
+                mAllowBikeLayout.setVisibility(View.INVISIBLE);
+                mBikeAccess.setTextColor(getResources().getColor(R.color.colorAccent));
+                mBikeAccess.setText("None");
             }
         }
 
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String reportStolen = preferences.getString("ReportStolen", "");
+
+        if (reportStolen.equals("true")) {
+
+            reportBike(urlJsonObjReportStolen);
+
+            // Restart the register bike process.
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString("ReportStolen", "false");
+            editor.apply();
+        }
+
+        mStolenBikeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                reportBike(urlJsonObjReportStolen);
+            }
+        });
+
+        mFoundBikeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                reportBike(urlJsonObjReportFound);
+            }
+        });
+
+        mNfcAdapter = NfcAdapter.getDefaultAdapter(this); // Check for available NFC Adapter
+        if (mNfcAdapter == null) {
+            Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
+        mNfcAdapter.setNdefPushMessageCallback(this, this); // Register callback
     }
 
     @Override
     public NdefMessage createNdefMessage(NfcEvent event) {
-        String text = ("RSA Works! \n\n" + "Beam Time: " + System.currentTimeMillis());
-        String sendingText = "";
         byte[] encodedBytes = null;
-        try {
-            Cipher c = Cipher.getInstance("RSA");
-            c.init(Cipher.ENCRYPT_MODE, privateKey);
-            encodedBytes = c.doFinal(text.getBytes());
-            sendingText = "Key: " + "\n"+ Base64.encodeToString(publicKey.getEncoded(),Base64.NO_WRAP) +"\n"+ "Encrypted Text: " +"\n"+ Base64.encodeToString(encodedBytes, Base64.NO_WRAP);
-        } catch (Exception e) {
+        String cipherText = null;
+
+        if (!symKeyString.equals("null")) {
+            byte[] symKeyByteArray = Base64.decode(symKeyString, Base64.NO_WRAP);
+            symKey = new SecretKeySpec(symKeyByteArray, 0, symKeyByteArray.length, "AES");
+            Log.e("SYMETRIC_KEY", Base64.encodeToString(symKey.getEncoded(), Base64.NO_WRAP));
         }
-        NdefMessage msg = new NdefMessage(new NdefRecord[] { createMimeRecord("application/@string/nfc_address", sendingText.getBytes())});
+
+        if ((locked.equals("true")) || (locked.equals("false"))) {
+            try {
+                Cipher c = Cipher.getInstance("AES");
+                c.init(Cipher.ENCRYPT_MODE, symKey);
+                encodedBytes = c.doFinal(locked.getBytes());
+                Log.e("Encoded Bytes", encodedBytes + " " + locked.getBytes());
+                cipherText = Base64.encodeToString(encodedBytes, Base64.NO_WRAP);
+            } catch (Exception e) {
+                Log.e("ERROR_AES", "AES encryption error");
+            }
+        }
+
+        mBikeLock.post(new Runnable() {
+            public void run() {
+                if (locked.equals("true")) {
+                    mBikeLock.setText("Unlocked");
+                    mBikeLock.setTextColor(getResources().getColor(R.color.colorAccent));
+                    mUnlockBikeLayout.setVisibility(View.INVISIBLE);
+                    mLockBikeLayout.setVisibility(View.VISIBLE);
+                } else {
+                    mBikeLock.setText("Locked");
+                    mBikeLock.setTextColor(getResources().getColor(R.color.colorPrimary));
+                    mLockBikeLayout.setVisibility(View.INVISIBLE);
+                    mUnlockBikeLayout.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        NdefMessage msg = new NdefMessage(new NdefRecord[]{createMimeRecord("application/@string/nfc_address", cipherText.getBytes())});
+        Log.e("NdefMessage", msg + " ");
         return msg;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        // Check to see that the Activity started due to an Android Beam
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
-            processIntent(getIntent());
-        }
-    }
-
-    @Override
-    public void onNewIntent(Intent intent) {
-        // onResume gets called after this to handle the intent
-        setIntent(intent);
-    }
-
-    /**
-     * Parses the NDEF Message from the intent and prints to the TextView
-     */
-    void processIntent(Intent intent) {
-
-        byte[] decodedBytes = null;
-        Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-
-        // only one message sent during the beam
-        NdefMessage msg = (NdefMessage) rawMsgs[0];
-        Log.e("NFCCCC", "YYYYY");
-        // record 0 contains the MIME type, record 1 is the AAR, if present
-//        String recString = new String(msg.getRecords()[0].getPayload());
-//        String[] stringSplit = recString.split("\n");
-//        String pubKey = stringSplit[1];
-//        String cipherText = stringSplit[3];
-//
-//        byte[] pubByte = Base64.decode(pubKey,Base64.NO_WRAP);
-//        byte[] cipTextByte = Base64.decode(cipherText,Base64.NO_WRAP);
-//        try{
-//            KeyFactory kf = KeyFactory.getInstance("RSA");
-//            Key pubKeyObe = kf.generatePublic(new X509EncodedKeySpec(pubByte));
-//            Cipher c = Cipher.getInstance("RSA");
-//            c.init(Cipher.DECRYPT_MODE, pubKeyObe);
-//            decodedBytes = c.doFinal(cipTextByte);
-//        }catch(Exception e){
-//
-//        }
-//
-//
-//        mBikeVin.setText("Key: " +pubKey+"\n\n"+"Cipher Text: "+ cipherText+"\n\n"+new String(decodedBytes));
-    }
-
-    /**
-     * Creates a custom MIME type encapsulated in an NDEF record
-     *
-     * @param mimeType
-     */
+    // Creates a custom MIME type encapsulated in an NDEF record // @param mimeType
     public NdefRecord createMimeRecord(String mimeType, byte[] payload) {
         byte[] mimeBytes = mimeType.getBytes(Charset.forName("US-ASCII"));
         NdefRecord mimeRecord = new NdefRecord(NdefRecord.TNF_MIME_MEDIA, mimeBytes, new byte[0], payload);
         return mimeRecord;
     }
 
-    /**
-     * Shows the progress UI and hides the normal form.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-            mNormalView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mNormalView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mNormalView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
-
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mNormalView.setVisibility(show ? View.GONE : View.VISIBLE);
-        }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        // Finalize registration.
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(UserBikeActivity.this);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("BikeEdit2", "true");
+        editor.apply();
+        finish();
     }
 
-    /**
-     * Represents an asynchronous login task used to authenticate
-     * the user.
-     */
-    private class BikeRegisterTask extends AsyncTask<Void, Void, Boolean> {
+    private void reportBike(String url){
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
 
-        BikeRegisterTask() {
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            /**
-             * Gets current device state and checks for working internet
-             * connection by trying Google.
-             **/
-//            ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-//            NetworkInfo netInfo = cm.getActiveNetworkInfo();
-//            if (netInfo != null && netInfo.isConnected()) {
-//                try {
-//                    URL url = new URL("http://www.google.com");
-//                    HttpURLConnection urlc = (HttpURLConnection) url
-//                            .openConnection();
-//                    urlc.setConnectTimeout(3000);
-//                    urlc.connect();
-//                    if (urlc.getResponseCode() == 200) {
-//                        return true;
-//                    }
-//                } catch (MalformedURLException e1) {
-//                    // TODO Auto-generated catch block
-//                    e1.printStackTrace();
-//                } catch (IOException e) {
-//                    // TODO Auto-generated catch block
-//                    e.printStackTrace();
-//                }
-//            }
-            return false;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-            showProgress(false);
-
-            if (success) {
-//                Intent myIntent = new Intent(UserLoginActivity.this, UserMainActivity.class);
-////                setResult(2);
-//                myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//                UserLoginActivity.this.startActivity(myIntent);
-//                finish();
-//                mEmailView = (EditText) findViewById(R.id.email);
-
-//                mEmail = mEmailView.getText().toString();
-//                mPassword = mPasswordView.getText().toString();
-//
-//                StringRequest postRequest = new StringRequest(Request.Method.POST, urlJsonObjLogin,
-//                        new Response.Listener<String>() {
-//                            @Override
-//                            public void onResponse(String response) {
-//                                // response
-//                                Log.e("Response", response);
-//
-//                                if (response.equals("Success")) {
-////                                    mBundle = new Bundle();
-////                                    mBundle.putParcelable(PARCEL_KEY, profile);
-//
-//                                    Intent myIntent = new Intent(UserLoginActivity.this, UserMainActivity.class);
-//                                    myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-////                                    myIntent.putExtras(mBundle);
-//                                    UserLoginActivity.this.startActivity(myIntent);
-//                                    finish();
-//                                } else {
-//                                    mEmailView.setError(getString(R.string.error_incorrect_email));
-//                                    mPasswordView.setError(getString(R.string.error_incorrect_password));
-//                                    focusView = mEmailView;
-//                                    focusView = mPasswordView;
-//                                }
-//                            }
-//                        },
-//                        new Response.ErrorListener() {
-//                            @Override
-//                            public void onErrorResponse(VolleyError error) {
-//                                // error
-//                                Log.e("Error.Response", String.valueOf(error));
-//                            }
-//                        }
-//                ) {
-//                    @Override
-//                    protected Map<String, String> getParams() {
-//                        Map<String, String> params = new HashMap<String, String>();
-//                        params.put("email", mEmail);
-//                        params.put("password", mPassword);
-//
-//                        return params;
-//                    }
-//                };
-//                queue.add(postRequest);
-            } else {
-//                Toast.makeText(getApplicationContext(),
-//                        "Error in Network Connection", Toast.LENGTH_SHORT)
-//                        .show();
-//                mEmailView.setError(getString(R.string.error_incorrect_email));
-//                mPasswordView.setError(getString(R.string.error_incorrect_password));
-//                mPasswordView.requestFocus();
+                        if (response.equals("success")) {
+                            if (status.equals("false")) {
+                                mBikeStatus.setText("Stolen");
+                                mBikeStatus.setTextColor(getResources().getColor(R.color.colorAccent));
+                                mFoundBikeLayout.setVisibility(View.VISIBLE);
+                                mStolenBikeLayout.setVisibility(View.INVISIBLE);
+                            } else {
+                                mBikeStatus.setText("Safe");
+                                mBikeStatus.setTextColor(getResources().getColor(R.color.colorPrimary));
+                                mFoundBikeLayout.setVisibility(View.INVISIBLE);
+                                mStolenBikeLayout.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // error
+                        Log.e("Error.Response", String.valueOf(error));
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("VIN", sepString[0]);
+                return params;
             }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-            showProgress(false);
-        }
+        };
+        queue.add(postRequest);
     }
 }

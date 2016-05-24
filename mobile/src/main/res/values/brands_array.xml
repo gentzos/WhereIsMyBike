@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="brands_array">
+        <item>Kildemoes</item>
+        <item>Everton</item>
+        <item>Trek</item>
+        <item>MBK</item>
+        <item>Avenue</item>
+        <item>Centurion</item>
+        <item>Batavus</item>
+        <item>Scott</item>
+    </string-array>
+</resources>

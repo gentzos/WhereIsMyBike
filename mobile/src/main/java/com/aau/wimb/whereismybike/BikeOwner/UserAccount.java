@@ -18,8 +18,9 @@ public class UserAccount implements Account, Parcelable {
     private String phoneNumber;
 
     // Facebook
-    String profileLink;
-    String profilePic;
+    private String profileId;
+    private String profileLink;
+    private String profilePic;
 
     public UserAccount() {
     }
@@ -42,6 +43,7 @@ public class UserAccount implements Account, Parcelable {
         lastName = in.readString();
         address = in.readString();
         phoneNumber = in.readString();
+        profileId = in.readString();
         profileLink = in.readString();
         profilePic = in.readString();
     }
@@ -114,6 +116,14 @@ public class UserAccount implements Account, Parcelable {
         this.phoneNumber = phoneNumber;
     }
 
+    public String getProfileId() {
+        return profileId;
+    }
+
+    public void setProfileId(String profileId) {
+        this.profileId = profileId;
+    }
+
     public String getProfileLink() {
         return profileLink;
     }
@@ -131,8 +141,7 @@ public class UserAccount implements Account, Parcelable {
     }
 
 //    @Override
-//    public void register() {
-//
+//    public void register{
 //    }
 //
 //    @Override
@@ -180,6 +189,7 @@ public class UserAccount implements Account, Parcelable {
         dest.writeString(lastName);
         dest.writeString(address);
         dest.writeString(phoneNumber);
+        dest.writeString(profileId);
         dest.writeString(profileLink);
         dest.writeString(profilePic);
     }

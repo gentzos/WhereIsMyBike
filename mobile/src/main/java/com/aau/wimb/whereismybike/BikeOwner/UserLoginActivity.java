@@ -67,13 +67,11 @@ import java.util.Map;
 public class UserLoginActivity extends AppCompatActivity {
 
     // json object response url
-    private String urlJsonObjLogin = "http://192.168.0.102:3000/wimb/login";
-    private String urlJsonObjLoginBikes = "http://192.168.0.102:3000/wimb/loginBikes";
-    private String urlJsonObjFb = "http://192.168.0.102:3000/wimb/facebookLogin";
+    private String urlJsonObjLogin = "http://192.168.0.104:3000/wimb/login";
+    private String urlJsonObjFb = "http://192.168.0.104:3000/wimb/facebookLogin";
 
     public static final String LOGIN_USER = "login_key";
     public static final String FBLOGIN_USER = "fblogin_key";
-    public static final String BIKE_KEY = "bike_key";
 
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
@@ -107,6 +105,8 @@ public class UserLoginActivity extends AppCompatActivity {
     private ProfileTracker mProfileTracker = null;
 
     private RequestQueue queue;
+
+    String[] user = new String[3];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -180,15 +180,15 @@ public class UserLoginActivity extends AppCompatActivity {
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         userLogin = preferences.getString("userLogin", "");
         Log.e("Login", userLogin);
-        if(!userLogin.equals("false"))
-        {
-            Intent myIntent = new Intent(UserLoginActivity.this, UserMainActivity.class);
-            myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            UserLoginActivity.this.startActivity(myIntent);
-            finish();
-        }
+//        if(!userLogin.equals("false"))
+//        {
+//            Intent myIntent = new Intent(UserLoginActivity.this, UserMainActivity.class);
+//            myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//            UserLoginActivity.this.startActivity(myIntent);
+//            finish();
+//        }
 
-//        AccessToken();
+        AccessToken();
 
         mFacebookButton.setReadPermissions("email");
         mFacebookButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
@@ -409,7 +409,7 @@ public class UserLoginActivity extends AppCompatActivity {
                             @Override
                             public void onResponse(String response) {
                                 // response
-                                Log.e("Response", response);
+                                Log.e("Response_NORMAL", response);
 
                                 if (response.equals("error")) {
                                     mEmailView.setError(getString(R.string.error_incorrect_email));
@@ -426,44 +426,12 @@ public class UserLoginActivity extends AppCompatActivity {
                                     editor.putString("userLogin", "normal");
                                     editor.apply();
 
-                                    StringRequest postRequest = new StringRequest(Request.Method.POST, urlJsonObjLoginBikes,
-                                            new Response.Listener<String>() {
-                                                @Override
-                                                public void onResponse(String response) {
-                                                    // response
-                                                    Log.e("Response", response);
-
-                                                    if (response.equals("error")) {
-                                                        Log.e("Error", response);
-
-                                                    } else {
-                                                        mBundle.putString(BIKE_KEY, response);
-
-                                                        Intent myIntent = new Intent(UserLoginActivity.this, UserMainActivity.class);
-                                                        myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                                        myIntent.putExtras(mBundle);
-                                                        UserLoginActivity.this.startActivity(myIntent);
-                                                        finish();
-                                                    }
-                                                }
-                                            },
-                                            new Response.ErrorListener() {
-                                                @Override
-                                                public void onErrorResponse(VolleyError error) {
-                                                    // error
-                                                    Log.e("Error.Response", String.valueOf(error));
-                                                }
-                                            }
-                                    ) {
-                                        @Override
-                                        protected Map<String, String> getParams() {
-                                            Map<String, String> params = new HashMap<String, String>();
-                                            params.put("email", mEmail);
-
-                                            return params;
-                                        }
-                                    };
-                                    queue.add(postRequest);
+//                                    dbBikes(response);
+                                    Intent myIntent = new Intent(UserLoginActivity.this, UserMainActivity.class);
+                                    myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    myIntent.putExtras(mBundle);
+                                    UserLoginActivity.this.startActivity(myIntent);
+                                    finish();
                                 }
                             }
                         },
@@ -510,15 +478,10 @@ public class UserLoginActivity extends AppCompatActivity {
                 protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
                     mAccessTokenTracker.stopTracking();
                     if (currentAccessToken == null) {
-                        //(the user has revoked your permissions -
-                        //by going to his settings and deleted your app)
-                        //do the simple login to FaceBook
+                        // The user has revoked permissions or deleted the app.
                         fbInfo.setText("You have been signed out, please login again.");
                     } else {
-                        //you've got the new access token now.
-                        //AccessToken.getToken() could be same for both
-                        //parameters but you should only use "currentAccessToken"
-
+                        // New access token received.
                         GraphRequest request = GraphRequest.newMeRequest(
                                 AccessToken.getCurrentAccessToken(),
                                 new GraphRequest.GraphJSONObjectCallback() {
@@ -530,11 +493,10 @@ public class UserLoginActivity extends AppCompatActivity {
                                     }
                                 });
                         Bundle parameters = new Bundle();
-                        parameters.putString("fields", "id,first_name,last_name,link,email"); //write the fields you need
+                        // Required fields.
+                        parameters.putString("fields", "id,first_name,last_name,link,email");
                         request.setParameters(parameters);
                         request.executeAsync();
-
-
                     }
                 }
             };
@@ -546,24 +508,23 @@ public class UserLoginActivity extends AppCompatActivity {
     // Communicate with database and redirect to MainActivity.
     private void Redirect(final Profile profile) {
 
-//        mBundle = new Bundle();
-        mBundle.putParcelable(FBLOGIN_USER, profile);
-
         StringRequest postRequest = new StringRequest(Request.Method.POST, urlJsonObjFb,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
 
-                        // response
-                        mBundle.putString(BIKE_KEY, response);
-                        Log.e("Response", response);
+                        Log.e("Response_FACEBOOK", response);
 
-//                      User signed in with facebook login.
+                        mBundle.putParcelable(FBLOGIN_USER, profile);
+                        mBundle.putString(LOGIN_USER, response);
+
+                        // User signed in with facebook login.
                         preferences = PreferenceManager.getDefaultSharedPreferences(UserLoginActivity.this);
                         editor = preferences.edit();
                         editor.putString("userLogin", "facebook");
                         editor.apply();
 
+//                        dbBikes(response);
                         Intent myIntent = new Intent(UserLoginActivity.this, UserMainActivity.class);
                         myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         myIntent.putExtras(mBundle);
@@ -582,9 +543,9 @@ public class UserLoginActivity extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                params.put("_id", profile.getId().toUpperCase());
-                params.put("fName", profile.getFirstName().toLowerCase());
-                params.put("lName", profile.getLastName().toLowerCase());
+                params.put("_id", profile.getId());
+                params.put("fName", profile.getFirstName());
+                params.put("lName", profile.getLastName());
 
                 return params;
             }

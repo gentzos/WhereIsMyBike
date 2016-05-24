@@ -72,8 +72,8 @@ public class PoliceAccount implements Account {
     }
 
 //    @Override
-//    public void register() {
-//
+//    public String register(String string) {
+//        return null;
 //    }
 //
 //    @Override

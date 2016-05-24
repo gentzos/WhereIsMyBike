@@ -45,9 +45,8 @@
                 android:id="@+id/edit_vin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="60dp"
                 android:hint="@string/prompt_bike_vin_change"
-                android:layout_below="@+id/bikeDetails"
+                android:layout_below="@+id/bikeVin"
                 android:textSize="15sp"
                 android:maxLines="1"
                 android:singleLine="true" />
@@ -56,41 +55,31 @@
                 android:id="@+id/bikeBrand"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/bikeVin"
-                android:layout_marginTop="25dp"
+                android:layout_below="@+id/edit_vin"
+                android:layout_marginTop="15dp"
                 android:hint="@string/prompt_bike_brand"
                 android:textStyle="bold" />
 
-            <EditText
+            <Spinner
                 android:id="@+id/edit_brand"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="60dp"
-                android:hint="@string/prompt_bike_brand_change"
-                android:textSize="15sp"
-                android:maxLines="1"
-                android:singleLine="true"
-                android:layout_below="@+id/edit_vin"/>
+                android:layout_below="@+id/bikeBrand"/>
 
             <TextView
                 android:id="@+id/bikeColor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/bikeBrand"
-                android:layout_marginTop="20dp"
+                android:layout_below="@+id/edit_brand"
+                android:layout_marginTop="15dp"
                 android:hint="@string/prompt_bike_color"
                 android:textStyle="bold" />
 
-            <EditText
+            <Spinner
                 android:id="@+id/edit_color"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="60dp"
-                android:hint="@string/prompt_bike_color_change"
-                android:textSize="15sp"
-                android:maxLines="1"
-                android:singleLine="true"
-                android:layout_below="@+id/edit_brand"/>
+                android:layout_below="@+id/bikeColor"/>
 
             <FrameLayout
                 android:id="@+id/save_button_frame"

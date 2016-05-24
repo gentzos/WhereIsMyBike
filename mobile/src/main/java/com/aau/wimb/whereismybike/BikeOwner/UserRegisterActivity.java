@@ -43,7 +43,7 @@ import java.util.Map;
  */
 public class UserRegisterActivity extends AppCompatActivity {
 
-    private String urlJsonObjRegister = "http://192.168.0.102:3000/wimb/register";
+    private String urlJsonObjRegister = "http://192.168.0.104:3000/wimb/register";
     public static final String REGISTER_USER = "register_key";
 
     /**
@@ -332,24 +332,7 @@ public class UserRegisterActivity extends AppCompatActivity {
             mAuthTask = null;
             showProgress(false);
 
-//            if (success) {
-//                Intent myIntent = new Intent(UserRegisterActivity.this,UserMainActivity.class);
-//                setResult(3);
-//                myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//                UserRegisterActivity.this.startActivity(myIntent);
-//                finish();
-//            } else {
-//                mPasswordView.setError(getString(R.string.error_incorrect_password));
-//                mPasswordView.requestFocus();
-//            }
-
             if (success) {
-//                Intent myIntent = new Intent(UserLoginActivity.this, UserMainActivity.class);
-////                setResult(2);
-//                myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//                UserLoginActivity.this.startActivity(myIntent);
-//                finish();
-//                mEmailView = (EditText) findViewById(R.id.email);
                 mEmail = mEmailView.getText().toString();
                 mPassword = mPasswordView.getText().toString();
                 mFirstName = mFirstNameView.getText().toString();
@@ -372,7 +355,7 @@ public class UserRegisterActivity extends AppCompatActivity {
                                     mBundle = new Bundle();
                                     mBundle.putString(REGISTER_USER, response);
 
-//                                  User signed in with facebook login.
+                                    // User registers.
                                     preferences = PreferenceManager.getDefaultSharedPreferences(UserRegisterActivity.this);
                                     editor = preferences.edit();
                                     editor.putString("userLogin", "register");
@@ -410,6 +393,8 @@ public class UserRegisterActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(),
                         "Error in Network Connection", Toast.LENGTH_SHORT)
                         .show();
+//                mPasswordView.setError(getString(R.string.error_incorrect_password));
+//                mPasswordView.requestFocus();
             }
         }
 
